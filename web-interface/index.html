@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chat-container {
+      width: 100%;
+      max-width: 600px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .chat-box {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .chat-box div {
+      margin-bottom: 10px;
+    }
+    .user-message {
+      text-align: right;
+    }
+    .bot-message {
+      text-align: left;
+    }
+    .input-box {
+      display: flex;
+    }
+    .input-box input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-right: 10px;
+    }
+    .input-box button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-box" id="chat-box">
+    <div class="bot-message">Hello! How can I assist you today?</div>
+  </div>
+  <div class="input-box">
+    <input type="text" id="user-input" placeholder="Type your message here...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+<script>
+  async function sendMessage() {
+    const userInput = document.getElementById('user-input').value;
+    if (!userInput) return;
+    debugger;
+    addMessage('user-message', userInput);
+    document.getElementById('user-input').value = '';
+    console.log('send button clicked');
+
+    const response = await fetch('https://ai-customer-chatbot.ue.r.appspot.com/detectIntent', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Origin':'http: //localhost',
+        'Referer' :'http: //localhost/'
+      },
+      body: JSON.stringify({
+        queryResult: {
+          queryText: userInput
+        }
+      })
+    });
+
+    console.log('API called');
+    const data = await response.json();
+    addMessage('bot-message', data.fulfillmentText);
+  }
+
+  function addMessage(className, text) {
+    const chatBox = document.getElementById('chat-box');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = className;
+    messageDiv.textContent = text;
+    chatBox.appendChild(messageDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+</script>
+
+</body>
+</html>
