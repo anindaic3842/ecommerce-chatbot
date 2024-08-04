@@ -37,10 +37,11 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // // Send a ping to confirm a successful connection
+    // await client.db("admin").command({ ping: 1 });
     console.log("Chatbot - Pinged your deployment. You successfully connected to MongoDB!");
     db = client.db('ecommerce');
+    const collection = db.collection('products');
     console.log("Chatbot - connect to database ecommerce");
     
     app.get('/', (req, res) => {
@@ -51,20 +52,31 @@ async function run() {
     console.log("Chatbot - connect to webhook");
     const intent = req.body.queryResult.intent.displayName;
     const parameters = req.body.queryResult.parameters;
+    const intentresponse = req.body.queryResult.fulfillmentText;
 
     if (intent === 'Order Tracking') {
       const orderNumber = parameters.orderNumber;
-      const order = await db.collection('orders').findOne({ orderNumber });
+      const order = await collection('orders').findOne({ orderNumber });
       if (order) {
         res.json({ fulfillmentText: `Your order status is: ${order.status}` });
       } else {
         res.json({ fulfillmentText: 'Order not found' });
       }
     } else if (intent === 'Product Recommendations') {
-      const recommendations = await db.collection('products').find().limit(5).toArray();
+      const recommendations = await collection.find().limit(5).toArray();
       const productNames = recommendations.map(product => product.product_name).join(', ');
       res.json({ fulfillmentText: `Recommended products: ${productNames}` });
-    } else {
+    }
+    else if(intent === 'Browse_Products'){
+      const recommendations = await collection.aggregate([
+        { $group: { _id: "category" } }, // Replace 'fieldName' with the actual field name
+        { $sort: { _id: 1 } } // Optional: Sort the unique values
+      ]).toArray();
+      console.log('product categories - ',recommendations);
+      const categoryNames = recommendations.map(product => product.category).join(', ');
+      res.json({ fulfillmentText: intentresponse.replace("[products]",categoryNames) });
+    }
+    else {
       res.json({ fulfillmentText: 'Unhandled intent' });
     }
   });
