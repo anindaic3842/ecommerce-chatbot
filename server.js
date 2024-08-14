@@ -28,28 +28,22 @@ console.log(`Server is running on port 1`);
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
-    strict: true,
+    strict: false,
     deprecationErrors: true,
   }
 });
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // // Send a ping to confirm a successful connection
-    // await client.db("admin").command({ ping: 1 });
-    console.log("Chatbot - Pinged your deployment. You successfully connected to MongoDB!");
     db = client.db('ecommerce');
     const collection = db.collection('products');
-    console.log("Chatbot - connect to database ecommerce");
     
     app.get('/', (req, res) => {
         res.send("Server Is Working......")
     });
 
     app.post('/', async (req, res) => {
-    console.log("Chatbot - connect to webhook");
     const intent = req.body.queryResult.intent.displayName;
     const parameters = req.body.queryResult.parameters;
     const intentresponse = req.body.queryResult.fulfillmentText;
@@ -68,12 +62,9 @@ async function run() {
       res.json({ fulfillmentText: `Recommended products: ${productNames}` });
     }
     else if(intent === 'Browse_Products'){
-      const recommendations = await collection.aggregate([
-        { $group: { _id: "category" } }, // Replace 'fieldName' with the actual field name
-        { $sort: { _id: 1 } } // Optional: Sort the unique values
-      ]).toArray();
-      console.log('product categories - ',recommendations);
-      const categoryNames = recommendations.map(product => product.category).join(', ');
+      const recommendations = await collection.distinct('category');
+      console.log(recommendations.join(', '));
+      const categoryNames = recommendations.join(', ');
       res.json({ fulfillmentText: intentresponse.replace("[products]",categoryNames) });
     }
     else {
@@ -82,15 +73,15 @@ async function run() {
   });
 
   app.post('/detectIntent', async (req, res) => {
-    console.log('request body - ', req.body);
     console.log('Inside detectIntent method');
+    console.log('request body - ', req.body);
     const sessionPath = sessionClient.projectAgentSessionPath(projectId,sessionId);
     console.log('detectIntent - session path initialized');
     const request = {
         session: sessionPath,
         queryInput: {
             text: {
-                text: req.body.queryResult.queryText, //req.body.text
+                text: req.body.queryResult.queryText,
                 languageCode: 'en-US',
             },
         },
@@ -100,13 +91,60 @@ async function run() {
         const responses = await sessionClient.detectIntent(request);
         console.log('detectIntent - calling dialogflow detectIntent API');
         const result = responses[0].queryResult;
-        console.log('detectIntent - reading response from detectIntent API');
+        console.log('detectIntent - reading response from detectIntent API', responses);
         res.json({ fulfillmentText: result.fulfillmentText });
     } catch (error) {
         console.error('ERROR:', error);
         res.status(500).send('Error processing request');
     }
 });
+
+// This is API for fetching Product Names
+app.post('/productSearch', async (req, res) => {
+  console.log('Entered product search API');
+  const productQuery = req.body.sessionInfo.parameters.productQuery;
+  const products = await fetchProductsFromDatabase(productQuery);
+
+  if (products.length > 0) {
+      const product = products[0];  // Take the first match or handle as needed
+      res.json({
+          fulfillment_response: {
+              messages: [
+                  {
+                      text: {
+                          text: [`${product.product_name}: ${product.description} - ${product.price}`]
+                      }
+                  }
+              ]
+          }
+      });
+  } else {
+      res.json({
+          fulfillment_response: {
+              messages: [
+                  {
+                      text: {
+                          text: ["Sorry, I couldn't find that product."]
+                      }
+                  }
+              ]
+          }
+      });
+  }
+});
+
+const fetchProductsFromDatabase = async (productQuery) => {
+  console.log(productQuery);
+
+  const query = { $text: { $search : productQuery}};
+  const options = {
+    sort: { product_name: 1 },
+    projection: { _id: 0, product_name: 1, price: 1, description: 1 },
+  };
+  const prodNames = await collection.find(query,options).toArray();
+  console.log(prodNames);
+  return prodNames;
+};
 
   const PORT = process.env.PORT || 50000;
 

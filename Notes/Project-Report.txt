@@ -1,0 +1,124 @@
+2.2.1 Components of Project Report
+These guidelines will provide the information for developing a project report. The components of the Project Report expected from the learners may include the following:
+Table of Contents
+
+Introduction/Objectives
+System Analysis
+Identification Of Need
+Preliminary Investigation
+Feasibility Study
+Project Planning
+Project Scheduling (PERT Chart & Gantt Chart)
+
+
+Software Requirement Specifications (SRS)
+
+
+Software Engineering Paradigm applied
+Data Models (like DFD)/Control Flow Diagrams/State Diagrams/Sequence Diagrams/ Entity Relationship Models, Class Diagrams/CRC Models/ Collaboration Diagrams/Use-case Diagrams/Activity Diagrams depending upon your project requirements
+
+
+System Design
+
+
+Modularisation Details
+Data Integrity and Constraints
+Database Design, Procedural Design/Object Oriented Design
+User Interface Design
+
+
+Test Cases (Unit Test Cases and System Test Cases)
+
+
+Coding
+
+SQL commands for
+
+Database Creation (along with constraints)
+Data Insertion in Tables, and
+Access Rights for different users
+
+
+Standardization of the coding
+Code Efficiency
+Error Handling
+Parameters Calling/Passing
+Validation Checks
+
+
+Testing
+
+Testing Techniques and Testing Strategies used
+Testing Plan Used
+Test reports for Unit Test Cases & System Test Cases
+Debugging and Code Improvement
+
+
+System Security Measures
+
+Database/Data Security implementation
+Creation of User Profiles
+Managing the User Rights
+
+
+Cost Estimation and its Model
+Future Scope
+Bibliography
+Appendices (if any)
+Data Dictionary
+
+
+Project Steering Committee (PSC) will evaluate the submitted synopsis and the marks will be awarded as per the distribution given below:
+ 
+
+
+Section
+
+
+File/Document
+
+
+Marks
+
+
+Section – A (Internal Assessment)
+
+
+Project Synopsis (under Sem 3 tab), post guide approval
+
+
+30
+
+
+Section – A (Term End)
+
+
+Project Report & Project PPT (to be appended at the end of the Project Report)
+
+
+50
+
+
+Section – B (Term End)
+
+
+Answer for Viva Questions
+
+
+20
+
+
+TOTAL
+
+
+100
+
+
+ 
+
+
+Assignments:
+Project Report - https://learning.onlinemanipal.com/d2l/lms/dropbox/user/folder_submit_files.d2l?ou=10000&db=4826
+
+
+View event – https://learning.onlinemanipal.com/d2l/le/calendar/10000/event/47689/detailsview?ou=10000#47689
