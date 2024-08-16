@@ -197,11 +197,55 @@ document.addEventListener('DOMContentLoaded', function () {
                   }
                 })
               });
+            debugger;
             const result = await response.json();
+            if(result.quickReplies)
+            {
+                displayQuickReplies(result.quickReplies);
+            }
             appendMessage(result.fulfillmentText, MessageType.bot);
         } catch (error) {
             console.error('Error:', error);
             appendMessage('Sorry, something went wrong. Please try again later.', MessageType.bot);
         }
     }
+
+    function displayQuickReplies(quickRepliesList) {
+        // Get the div element where the ordered list will be added
+        //const quickRepliesContainer = document.getElementById("quick-replies");
+        quickReplies.innerHTML = ""; // Clear any existing content
+        showQuickReplies();
+        // Create an ordered list element
+        const ol = document.createElement("ol");
+        ol.id = "quick-replies-list"; // Optional: Add an ID to the <ol> for styling
+      
+        // Loop through the quickReplies array and create <li> elements for each reply
+        quickRepliesList.forEach(reply => {
+          const listItem = document.createElement("li");
+          listItem.textContent = reply;
+          listItem.classList.add("quick-reply-button");
+      
+          // Add an event listener for when the user clicks on the list item
+          listItem.addEventListener("click", () => {
+            handleQuickReplyClick(reply);
+          });
+      
+          // Append the list item to the ordered list
+          ol.appendChild(listItem);
+        });
+      
+        // Append the ordered list to the div
+        quickReplies.appendChild(ol);
+      }
+      
+    function handleQuickReplyClick(reply) {
+        appendMessage(reply, MessageType.user);
+        hideQuickReplies(); // Hide quick replies after a selection
+        showTypingIndicator(); // Show typing indicator
+        setTimeout(() => {
+            sendServerMessage(reply);
+            hideTypingIndicator(); // Hide typing indicator after bot responds
+        }, 1500);
+      }
+
 });
