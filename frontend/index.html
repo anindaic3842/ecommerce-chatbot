@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>E-commerce Chatbot UI</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+<body>
+    <div id="chatbot-container">
+        <!-- Header -->
+        <div id="chat-header">
+            <div id="header-content">
+                <div id="bot-avatar">
+                    <img src="assets/chatbotimage.png" alt="Bot Avatar">
+                </div>
+                <div id="bot-info">
+                    <span id="bot-name">ShopBuddy</span>
+                </div>
+                <div id="close-btn">
+                    <button>&#10005;</button>
+                </div>
+            </div>
+            <div id="bot-description">
+                <p>Your personal shopping assistant. Ask questions, get help, and discover new products.</p>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div id="chat-window">
+            <div id="message-container">
+                <!-- Placeholder for dynamic messages -->
+            </div>
+            <!-- Typing Indicator at the Bottom -->
+            <div id="typing-indicator" class="hidden">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+
+        <!-- Quick Reply Section -->
+        <div id="quick-replies" class="hidden">
+            <ol>
+              </ol>
+        </div>
+
+        <!-- Input Area -->
+        <div id="input-area">
+            <input type="text" id="user-input" placeholder="Ask anything...">
+            <button id="send-btn">&#10148;</button>
+        </div>
+
+        <!-- Feedback Form -->
+        <div id="feedback-form" class="hidden">
+            <p>Thanks for shopping with us!</p>
+            <p>Please rate your experience below</p>
+            <div id="rating">
+                <!-- Rating stars -->
+                <span>⭐</span>
+                <span>⭐</span>
+                <span>⭐</span>
+                <span>⭐</span>
+                <span>⭐</span>
+            </div>
+            <textarea placeholder="Add note..."></textarea>
+            <div id="feedback-buttons">
+                <button id="skip-btn">Skip</button>
+                <button id="send-feedback-btn">Send Feedback</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Minimized Chat Icon -->
+    <div id="minimized-chat-icon" class="hidden">
+        <img src="assets/chatbotimage.png" alt="Chatbot Icon">
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

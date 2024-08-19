@@ -1,0 +1,237 @@
+/* Apply the Roboto font across the entire UI */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa; /* Light gray background */
+    height: 100%;
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+#chatbot-container {
+    width: 720px; /* Adjust width to match the screenshot */
+    height: 700px; /* Adjust height to match the screenshot */
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Changed from fixed */
+    overflow: hidden;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+#minimized-chat-icon {
+    display: none; /* Hide the minimized chat icon */
+}
+
+#chat-header {
+    background-color: #007bff; /* Primary color (blue) for the header */
+    color: white;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    text-align: center;
+}
+
+#header-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+#bot-avatar img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+#bot-info {
+    flex-grow: 1;
+    text-align: left;
+    margin-left: 15px;
+}
+
+#bot-name {
+    font-size: 18px;
+    font-weight: 700; /* Bold font for the bot name */
+}
+
+#bot-status {
+    font-size: 12px;
+    font-weight: 400; /* Regular weight for the bot status */
+}
+
+#close-btn button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#bot-description {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #d1d1d1;
+}
+
+#chat-window {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Enable scrolling */
+    padding: 15px;
+    background-color: #ffffff; /* White background for the chat window */
+}
+
+#message-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* Style for user messages */
+.user-message {
+    background-color: #007bff; /* Primary blue for user messages */
+    color: white;
+    align-self: flex-end;
+    border-radius: 15px 15px 0 15px; /* Rounded corners */
+    padding: 12px;
+    margin: 10px 0;
+    max-width: 80%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for bot messages */
+.bot-message {
+    background: linear-gradient(135deg, #e0e0e0 0%, #cfcfcf 100%); /* Stronger gradient for more contrast */
+    color: #2c2c2c; /* Darker gray text for higher contrast */
+    align-self: flex-start;
+    border-radius: 15px 15px 15px 0; /* Rounded corners with a unique cut */
+    padding: 12px;
+    margin: 10px 0;
+    max-width: 80%;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow for more depth */
+    position: relative;
+}
+
+/* Optional: Add a small arrow to the left of the bot message */
+.bot-message:before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 10px;
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid #cfcfcf; /* Same as the end of the gradient */
+}
+
+/* Typing indicator styles */
+#typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #f8f9fa;
+    border-radius: 15px;
+    width: fit-content;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    margin: 0 2px;
+    background-color: #343a40; /* Dark gray for typing dots */
+    border-radius: 50%;
+    animation: typing 1s infinite;
+}
+
+@keyframes typing {
+    0% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+}
+
+/* Quick replies section */
+#quick-replies {
+    padding: 10px;
+    background-color: #f8f9fa; /* Light gray background for the quick replies area */
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.quick-reply-button {
+    background-color: #007bff; /* Primary blue color for quick reply buttons */
+    color: white; /* White text for contrast */
+    padding: 8px 15px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 5px;
+    flex: 1 1 45%; /* Allows two buttons per row */
+}
+
+.quick-reply-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Input area and send button */
+#input-area {
+    display: flex;
+    padding: 15px;
+    background-color: #f8f9fa; /* Light gray background */
+    align-items: center;
+    border-top: 1px solid #e0e0e0;
+}
+
+#user-input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+    font-size: 16px; /* Larger font for a bigger input area */
+    color: #343a40; /* Dark gray text */
+    background-color: #ffffff; /* White input field */
+}
+
+#send-btn {
+    background-color: #007bff; /* Primary color for the send button */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#send-btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Hide elements when necessary */
+.hidden {
+    display: none;
+}
