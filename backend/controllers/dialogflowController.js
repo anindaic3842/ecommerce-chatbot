@@ -27,6 +27,7 @@ const detectIntent = async (req, res) => {
     queryInput: {
       text: {
         text: req.body.queryResult.queryText,
+        parameters: req.body.queryResult.parameters
       },
       languageCode: languageCd,
     },

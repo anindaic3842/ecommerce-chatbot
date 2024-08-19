@@ -2,16 +2,16 @@
 // productRoutes.js
 const express = require('express');
 const router = express();
-const { productSearch, productCategorySearch, productSearchByCategory, productDetails } = require('../controllers/productController');
+const { productSearch, fetchDistinctCategory, fetchProductsUsingCategory, productDetails } = require('../controllers/productController');
 
 // Route for product search
 router.post('/productSearch', productSearch);
 
 // Route for product category search
-router.post('/productCategorySearch', productCategorySearch);
+router.post('/productCategorySearch', fetchDistinctCategory);
 
 // Route for searching products by category
-router.post('/productSearchByCategory', productSearchByCategory);
+router.post('/productSearchByCategory', fetchProductsUsingCategory);
 
 // Route for fetching product details
 router.post('/productDetails', productDetails);

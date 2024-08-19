@@ -206,7 +206,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     appendMessage(msg, MessageType.bot);
                 });
             }
-
         } catch (error) {
             console.error('Error:', error);
             appendMessage('Sorry, something went wrong. Please try again later.', MessageType.bot);
