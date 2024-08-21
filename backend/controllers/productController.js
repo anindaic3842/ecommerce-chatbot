@@ -1,6 +1,7 @@
 //Handles product-related requests.
 
 // productController.js
+const { text } = require('body-parser');
 const { db } = require('../config/dbConfig');
 const logger = require('../utils/logger');
 
@@ -42,33 +43,36 @@ const fetchProductsUsingCategory = async (req, res) => {
 const productDetails = async (req, res) => {
   logger.info(`ProductDetailsAPI - request body ${ JSON.stringify(req.body)}`);
   try {
-    const product = await getProductDetails(req.body.sessionInfo.parameters.productquery);
+    const product =await getProductDetails(req.body.sessionInfo.parameters.productquery);
     if (product) {
       const response = buildProductDetailsResponse(product);
+      logger.info(`ProductDetailsAPI - response ${ JSON.stringify(response)}`);
       res.json(response);
     } else {
       res.json(buildNotFoundResponse());
     }
   } catch (error) {
-    logger.error(`ProductDetailsAPI - error ${ JSON.stringify(error)}`);
+    logger.error(`ProductDetailsAPI - error ${ JSON.stringify(error.message)}`);
     res.status(500).send('Unable to process your request');
   }
 };
 
 // Fetch products based on search query
-const productSearch = async (req, res) => {
-  logger.info('Received productSearch API request');
+const productSimilarSearch = async (req, res) => {
+  logger.info(`Received productSimilarSearch API request ${ JSON.stringify(req.body)}`);
   try {
-    const productQuery = req.body.sessionInfo.parameters.productQuery;
-    const products = await searchProducts(productQuery);
-
+    const productQuery = req.body.sessionInfo.parameters.product_name;
+    const products = await searchSimilarProducts(productQuery);
+    logger.info(`productSimilarSearch product data - ${ JSON.stringify(products)}`);
     if (products.length > 0) {
-      res.json(buildProductSearchResponse(products[0]));
+      const response = buildProductSearchResponse(products[0]);
+      logger.info(`productSimilarSearch API response ${ JSON.stringify(response)}`);
+      res.json(response);
     } else {
       res.json(buildNotFoundResponse());
     }
   } catch (error) {
-    logger.error('productSearch API error', { error });
+    logger.error(`productSimilarSearch API error ${ error.message }`);
     res.status(500).send('Unable to process your request');
   }
 };
@@ -96,12 +100,12 @@ const getProductDetails = async (productName) => {
   return products.length > 0 ? products[0] : null;
 };
 
-const searchProducts = async (query) => {
+const searchSimilarProducts = async (query) => {
   const collection = db.collection('products');
-  const searchQuery = { $text: { $search: query } };
+  const searchQuery = { product_name: { $regex: query } };
   const options = {
     sort: { product_name: 1 },
-    projection: { _id: 0, product_name: 1, price: 1, description: 1 },
+    projection: { _id: 0, product_name: 1, price: 1, description: 1, quantity : 1 },
   };
   return await collection.find(searchQuery, options).toArray();
 };
@@ -110,7 +114,6 @@ const buildRichContentResponse = (options) => ({
   fulfillment_response: {
     messages: [
       {
-        source: "WEBHOOK",
         payload: {
           richContent: [
             [
@@ -122,8 +125,7 @@ const buildRichContentResponse = (options) => ({
           ]
         }
       }
-    ],
-    tag: 'quick-replies-response'
+    ]
   }
 });
 
@@ -132,15 +134,31 @@ const buildProductDetailsResponse = (product) => ({
     messages: [
       {
         responseType: "ENTRY_PROMPT",
-        source: "WEBHOOK",
+        type: "formattedText",
         text: {
-          text: [
-            `\n\n- **Description:** ${product.description}\n- **Price:** ${product.price}\n- **Availability:** ${product.quantity}\n\nWould you like to purchase this product, or go back to the product list?`
+          text: [`- **Description:** ${product.description}\n- **Price:** ${product.price}\n- **Availability:** ${product.quantity}\n\nWould you like to purchase this product, or go back to the product list?`
           ]
         }
       }
-    ],
-    tag: 'product-details-response'
+      ,
+      {
+        responseType: "ENTRY_PROMPT",
+        payload: {
+          richContent: [
+            [
+              {
+                type: "chips",
+                options: [
+                  { text: "Buy" },
+                  { text: "Go back to product list" }
+                ]
+              }
+            ]
+          ]
+        }
+      }
+    ]
+    ,source: "WEBHOOK"
   }
 });
 
@@ -148,13 +166,42 @@ const buildProductSearchResponse = (product) => ({
   fulfillment_response: {
     messages: [
       {
-        source: "WEBHOOK",
+        responseType: "ENTRY_PROMPT",
+        type: "plainText",
         text: {
-          text: [`${product.product_name}: ${product.description} - ${product.price}`]
+          text: [`Great choice! You searched for ${product.product_name}. Here are the details...`
+          ]
+        }
+      }
+      ,
+      {
+        responseType: "ENTRY_PROMPT",
+        type: "formattedText",
+        text: {
+          text: [`- **Description:** ${product.description}\n- **Price:** ${product.price}\n- **Availability:** ${product.quantity}\n\nWould you like to purchase this product, or search for another item?`
+          ]
+        }
+      }
+      ,
+      {
+        responseType: "ENTRY_PROMPT",
+        payload: {
+          richContent: [
+            [
+              {
+                type: "chips",
+                options: [
+                  { text: "Buy" },
+                  { text: "Search for another item" },
+                  { text: "Go back to main menu" }
+                ]
+              }
+            ]
+          ]
         }
       }
     ],
-    tag: 'product-list-response'
+    source: "WEBHOOK"
   }
 });
 
@@ -163,14 +210,12 @@ const buildNotFoundResponse = () => ({
     messages: [
       {
         responseType: "ENTRY_PROMPT",
-        source: "WEBHOOK",
         text: {
           text: ["Sorry! I could not find what you were looking for. \n\nWould you like to go back to the product list?"]
         }
       }
-    ],
-    tag: 'no-match-response'
+    ]
   }
 });
 
-module.exports = { productSearch, fetchDistinctCategory, fetchProductsUsingCategory, productDetails };
+module.exports = { productSimilarSearch, fetchDistinctCategory, fetchProductsUsingCategory, productDetails };

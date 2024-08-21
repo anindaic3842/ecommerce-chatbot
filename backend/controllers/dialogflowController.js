@@ -81,11 +81,11 @@ const detectIntent = async (req, res) => {
     res.json({
       fulfillmentText: responseText,
       quickReplies: quickReplies,
-      requestAppendMessage: intentTrainingPhraseType[reqAppMessage],
+      requestAppendMessage: intentTrainingPhraseType[reqAppMessage] || '',
       sessionId: sessionId
     });
   } catch (error) {
-    logger.error(`detectIntent error- ${ JSON.stringify(error.message) }`);
+    logger.error(`detectIntent error - ${ JSON.stringify(error.message) }`);
     res.status(500).send('Error processing request');
     //throw error;
   }

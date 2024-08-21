@@ -70,35 +70,6 @@ document.addEventListener('DOMContentLoaded', function () {
         chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    // Process bot response
-    function processBotResponse(userMessage) {
-        let botResponse = '';
-
-        switch (true) {
-            case /track/i.test(userMessage):
-                botResponse = 'Please provide your order number to track your order.';
-                break;
-            case /return/i.test(userMessage):
-                botResponse = 'What item would you like to return?';
-                break;
-            case /recommend/i.test(userMessage):
-                botResponse = 'Here are some product recommendations for you!';
-                sendServerMessage(userMessage);
-                showProductCarousel();
-                break;
-            case /promo/i.test(userMessage):
-                botResponse = 'Enter your promo code to apply it to your cart.';
-                break;
-            case /help/i.test(userMessage):
-                botResponse = 'How can I help you today?';
-                break;
-            default:
-                botResponse = 'Sorry, I didn’t understand that. Can you please rephrase?';
-        }
-
-        appendMessage(botResponse, MessageType.bot);
-    }
-
     // Show typing indicator
     function showTypingIndicator() {
         typingIndicator.style.display = 'flex';
@@ -242,6 +213,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function handleQuickReplyClick(reply,requestText) {
+        debugger;
         appendMessage(reply, MessageType.user);
         hideQuickReplies(); // Hide quick replies after a selection
         showTypingIndicator(); // Show typing indicator
