@@ -2,7 +2,7 @@
 // productRoutes.js
 const express = require('express');
 const router = express();
-const { productSimilarSearch, fetchDistinctCategory, fetchProductsUsingCategory, productDetails } = require('../controllers/productController');
+const { productSimilarSearch, fetchDistinctCategory, fetchProductsUsingCategory, productDetails, handleBuyProduct } = require('../controllers/productController');
 
 // Route for product search
 router.post('/productSimilarSearch', productSimilarSearch);
@@ -15,5 +15,8 @@ router.post('/productSearchByCategory', fetchProductsUsingCategory);
 
 // Route for fetching product details
 router.post('/productDetails', productDetails);
+
+// Route for buying a product
+router.post('/productbuy', handleBuyProduct);
 
 module.exports = router;

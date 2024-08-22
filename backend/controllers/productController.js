@@ -1,5 +1,4 @@
 //Handles product-related requests.
-
 // productController.js
 const { text } = require('body-parser');
 const { db } = require('../config/dbConfig');
@@ -43,7 +42,7 @@ const fetchProductsUsingCategory = async (req, res) => {
 const productDetails = async (req, res) => {
   logger.info(`ProductDetailsAPI - request body ${ JSON.stringify(req.body)}`);
   try {
-    const product =await getProductDetails(req.body.sessionInfo.parameters.productquery);
+    const product =await getProductDetails(req.body.sessionInfo.parameters.product_name);
     if (product) {
       const response = buildProductDetailsResponse(product);
       logger.info(`ProductDetailsAPI - response ${ JSON.stringify(response)}`);
@@ -74,6 +73,34 @@ const productSimilarSearch = async (req, res) => {
   } catch (error) {
     logger.error(`productSimilarSearch API error ${ error.message }`);
     res.status(500).send('Unable to process your request');
+  }
+};
+
+const handleBuyProduct = async (req, res) => {
+  logger.info(`Received handleBuyProduct API request ${JSON.stringify(req.body)}`);
+  try {
+    // Extract necessary parameters from the request
+    const productquery = req.body.sessionInfo.parameters.product_name;
+    // Fetch the product details from the database
+    const product = await searchSimilarProducts(productquery);
+    logger.info(`handleBuyProduct product data - ${JSON.stringify(product)}`);
+    if (product) {
+      // Prepare the response confirming the purchase and providing the payment link
+      const response = buildBuyProductResponse(product[0]);
+      // Send the response back to Dialogflow
+      logger.info(`handleBuyProduct API response ${JSON.stringify(response)}`);
+      res.json(response);
+    } else {
+      // Handle case where product is not found
+      const response = buildProductNotFoundResponse(productquery);
+      logger.info(`handleBuyProduct NO product found response ${JSON.stringify(response)}`);
+      // Send the response back to Dialogflow
+      res.json(response);
+    }
+  } catch (error) {
+    logger.error(`Error in handleBuyProduct webhook:${error.message}`);
+    // Respond with an error message
+    res.status(500).json(buildGenericErrorResponse());
   }
 };
 
@@ -136,7 +163,13 @@ const buildProductDetailsResponse = (product) => ({
         responseType: "ENTRY_PROMPT",
         type: "formattedText",
         text: {
-          text: [`- **Description:** ${product.description}\n- **Price:** ${product.price}\n- **Availability:** ${product.quantity}\n\nWould you like to purchase this product, or go back to the product list?`
+          text: [
+            `<div style="font-family: Arial, sans-serif;">
+               <p>- <strong>Description:</strong> ${product.description}</p>
+               <p>- <strong>Price:</strong> ${product.price}</p>
+               <p>- <strong>Availability:</strong> ${product.quantity}</p>
+               <p>Would you like to purchase this product, or go back to the product list?</p>
+             </div>`
           ]
         }
       }
@@ -205,6 +238,60 @@ const buildProductSearchResponse = (product) => ({
   }
 });
 
+const buildBuyProductResponse = (product) => ({
+    fulfillment_response: {
+      messages: [
+        {
+          responseType: "ENTRY_PROMPT",
+          text: {
+            text: [
+              `<div style="font-family: Arial, sans-serif;">
+                 <p>Your order for <strong>${product.product_name}</strong> has been placed successfully!</p>
+                 <p>Please complete your payment on our website using the link below:</p>
+                 <p style="margin: 8px 0;">
+                   👉 <a href="https://yourwebsite.com/payment?product=${product._id}" target="_blank">[Pay Now]</a>
+                 </p>
+                 <p>If you have any issues, feel free to reach out to our customer support.</p>
+               </div>`
+            ]
+          }
+        }
+      ]
+    }
+  }
+);
+
+const buildProductNotFoundResponse = (productquery) => ({
+    fulfillment_response: {
+      messages: [
+        {
+          responseType: "ENTRY_PROMPT",
+          text: {
+            text: [
+              `Sorry, we couldn't find the product ${productquery}. Would you like to search for another product?`
+            ]
+          }
+        },
+        {
+          responseType: "ENTRY_PROMPT",
+          payload: {
+            richContent: [
+              [
+                {
+                  type: "chips",
+                  options: [
+                    { text: "Search for another item" },
+                    { text: "Return to main menu" }
+                  ]
+                }
+              ]
+            ]
+          }
+        }
+      ]
+    }
+});
+
 const buildNotFoundResponse = () => ({
   fulfillment_response: {
     messages: [
@@ -218,4 +305,19 @@ const buildNotFoundResponse = () => ({
   }
 });
 
-module.exports = { productSimilarSearch, fetchDistinctCategory, fetchProductsUsingCategory, productDetails };
+const buildGenericErrorResponse = () => ({
+    fulfillment_response: {
+      messages: [
+        {
+          responseType: "ENTRY_PROMPT",
+          text: {
+            text: [
+              "Sorry, there was an issue processing your request. Please try again later."
+            ]
+          }
+        }
+      ]
+    }
+});
+
+module.exports = { productSimilarSearch, fetchDistinctCategory, fetchProductsUsingCategory, productDetails, handleBuyProduct };

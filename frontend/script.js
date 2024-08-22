@@ -60,9 +60,23 @@ document.addEventListener('DOMContentLoaded', function () {
     function appendMessage(text, className) {
         const messageElement = document.createElement('div');
         messageElement.className = `message ${className}`;
-        messageElement.textContent = text;
+
+        if (isHTML(text)) {
+            messageElement.innerHTML = text; // Render as HTML
+        } else {
+            messageElement.textContent = text; // Render as plain text
+        }
+
+        //messageElement.textContent = text;
         messageContainer.appendChild(messageElement);
         scrollToBottom();
+    }
+    // This function is to detect whether the content is plain text or HTML text
+    function isHTML(content) {
+        const parser = new DOMParser();
+        const parsedDocument = parser.parseFromString(content, 'text/html');
+        // If the parsed content has any nodes under the body tag, it's HTML
+        return Array.from(parsedDocument.body.childNodes).some(node => node.nodeType === 1);
     }
 
     // Scroll to bottom of chat window

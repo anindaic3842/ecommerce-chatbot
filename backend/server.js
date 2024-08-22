@@ -7,6 +7,7 @@ const logger = require('./utils/logger');
 
 const dialogflowRoutes = require('./routes/dialogflowRoutes');
 const productRoutes = require('./routes/productRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 // Import other routes as needed
 
 // Middleware setup
@@ -20,6 +21,7 @@ app.use(cors({
 // Routes
 app.use('/dialogflow', dialogflowRoutes);
 app.use('/products', productRoutes);
+app.use('/orders', orderRoutes);
 // Add other routes as needed
 
 app.get('/', (req, res) => {

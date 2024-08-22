@@ -2,8 +2,8 @@
 // orderRoutes.js
 const express = require('express');
 const router = express();
-const { trackOrder } = require('../controllers/orderController');
+const { orderstatus } = require('../controllers/orderController');
 
-router.post('/trackOrder', trackOrder);
+router.post('/trackorder', orderstatus);
 
 module.exports = router;

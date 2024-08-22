@@ -2,18 +2,14 @@
 // dialogflowController.js
 const { sessionClient, sessionId, projectId, locationId, agentId, languageCd } = require('../config/dialogflowConfig');
 const logger = require('../utils/logger');
-const intentTrainingPhraseType = {
-  projmca_intent_browse_products: 'Show me ',
-  projmca_intent_product_search: 'Show me ',
-  projmca_intent_single_product: 'Show me ',
-  projmca_intent_goodbye: '',
-  projmca_intent_welcome: '',
-  projmca_intent_negative: '',
-  projmca_intent_default:'',
+const currentPageInFlow = {
+  browse_products_page : 'Show me ',
+  select_category_page: 'Show me ',
+  default_page:'',
 };
 
 const detectIntent = async (req, res) => {
-  logger.info(`Received detectIntent request with requestBody as - ${req.body}`);
+  logger.info(`Received detectIntent request with requestBody as - ${JSON.stringify(req.body)}`);
   
   const sessionPath = sessionClient.projectLocationAgentSessionPath(
     projectId,
@@ -38,7 +34,7 @@ const detectIntent = async (req, res) => {
     const responses = await sessionClient.detectIntent(request);
     logger.info(`response body - ${JSON.stringify(responses[0])}`);
     
-    const reqAppMessage = (responses[0].queryResult.intent !== null) ? responses[0].queryResult.intent.displayName : 'projmca_intent_default';
+    const reqAppMessage = (responses[0].queryResult.currentPage !== null) ? responses[0].queryResult.currentPage.displayName : 'default_page';
     //const reqAppMessage = responses[0].queryResult.intent.displayName;
     const responseMessages = responses[0].queryResult.responseMessages;
 
@@ -81,7 +77,7 @@ const detectIntent = async (req, res) => {
     res.json({
       fulfillmentText: responseText,
       quickReplies: quickReplies,
-      requestAppendMessage: intentTrainingPhraseType[reqAppMessage] || '',
+      requestAppendMessage: currentPageInFlow[reqAppMessage] || '',
       sessionId: sessionId
     });
   } catch (error) {
