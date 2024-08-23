@@ -212,29 +212,40 @@ body, html {
 }
 
 /* Quick replies section */
+/* Quick replies section */
 #quick-replies {
     padding: 10px;
-    background-color: #f8f9fa; /* Light gray background for the quick replies area */
-    border-top: 1px solid #e0e0e0;
+    background-color: #f8f9fa; /* Maintain your existing background color */
     display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    justify-content: flex-start; /* Align the items to the left */
+    flex-wrap: wrap; /* Allow the buttons to wrap to the next line */
+    gap: 10px; /* Adds space between buttons */
+    border-top: 1px solid #e0e0e0; /* Maintain the top border */
 }
 
 .quick-reply-button {
-    background-color: #007bff; /* Primary blue color for quick reply buttons */
-    color: white; /* White text for contrast */
+    background-color: #007bff; /* Maintain the primary blue color */
+    color: white; /* Maintain the white text */
     padding: 8px 15px;
     border: none;
     border-radius: 25px;
     cursor: pointer;
     font-size: 14px;
-    margin: 5px;
-    flex: 1 1 45%; /* Allows two buttons per row */
+    margin: 0; /* Remove margin to make them more compact */
+    flex: 0 0 auto; /* Flexible width, takes only as much space as needed */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Maintain the box shadow */
+    transition: background-color 0.3s, transform 0.3s; /* Maintain the transition effects */
 }
 
 .quick-reply-button:hover {
     background-color: #0056b3; /* Darker blue on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+@media (max-width: 500px) {
+    .quick-reply-button {
+        flex: 1 1 100%; /* Stacks buttons vertically on smaller screens */
+    }
 }
 
 /* Input area adjustments */

@@ -29,17 +29,40 @@ const buildOrderTrackResponse = (order) => ({
         responseType: "ENTRY_PROMPT",
         text: {
           text: [
-            `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-               <h2 style="text-align: center; color: #333;">Order Tracking Status</h2>
-               <p><strong>Order ID:</strong> ${order.order_id}</p>
-               <p><strong>Shipping Carrier:</strong> ${order.shipping_carrier}</p>
-               <p><strong>Tracking Number:</strong> ${order.tracking_number}</p>
-               <p><strong>Current Status:</strong> ${order.status}</p>
-               <p><strong>Estimated Delivery:</strong> ${order.estimated_delivery}</p>
-               <div style="margin-top: 20px; text-align: center;">
-                 <a href="https://yourtrackingwebsite.com/track?order_id=${order.order_id}" style="background-color: #0073b7; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Track Your Order</a>
-               </div>
-             </div>`
+            `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                <h2 style="text-align: center; color: #0073b7; margin-bottom: 20px;">Order Tracking Status</h2>
+                <p style="margin: 10px 0;"><strong style="color: #555;">Order ID:</strong> ${order.order_id}</p>
+                <p style="margin: 10px 0;"><strong style="color: #555;">Shipping Carrier:</strong> ${order.shipping_carrier}</p>
+                <p style="margin: 10px 0;"><strong style="color: #555;">Tracking Number:</strong> ${order.tracking_number}</p>
+                <p style="margin: 10px 0; font-weight: bold; color: ${order.status === 'Shipped' ? '#28a745' : '#dc3545'};"><strong>Current Status:</strong> ${order.status}</p>
+                <p style="margin: 10px 0;"><strong style="color: #555;">Estimated Delivery:</strong> ${order.estimated_delivery ? order.estimated_delivery : 'To be determined'}</p>
+                <div style="margin-top: 20px; text-align: center;">
+                    <a href="https://yourtrackingwebsite.com/track?order_id=${order.order_id}" style="background-color: #0073b7; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Track Your Order</a>
+                </div>
+            </div>`
+          ]
+        }
+      },
+      {
+        "responseType": "ENTRY_PROMPT",
+        "payload": {
+          "richContent": [
+            [
+              {
+                "type": "chips",
+                "options": [
+                  {
+                    "text": "Track another order"
+                  },
+                  {
+                    "text": "Return to main menu"
+                  },
+                  {
+                    "text": "Speak to customer support"
+                  }
+                ]
+              }
+            ]
           ]
         }
       }

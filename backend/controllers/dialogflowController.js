@@ -11,11 +11,18 @@ const currentPageInFlow = {
 const detectIntent = async (req, res) => {
   logger.info(`Received detectIntent request with requestBody as - ${JSON.stringify(req.body)}`);
   
+  if(req.body == null || req.body.sessionId == null) {
+    logger.error(`The request body for detectIntent has an issue - ${JSON.stringify(req.body)}`);
+    res.status(500).send('Error processing request');
+  }
+
+  const userSessionId = req.body.sessionId;
+
   const sessionPath = sessionClient.projectLocationAgentSessionPath(
     projectId,
     locationId,
     agentId,
-    sessionId,
+    userSessionId,
   );
 
   const request = {

@@ -166,9 +166,26 @@ document.addEventListener('DOMContentLoaded', function () {
     //   feedbackForm.classList.remove('hidden');
     //}, 5000);
 
+    // Function to get or create the session ID
+    function getSessionId() {
+        let sessionId = sessionStorage.getItem('sessionId');
+        if (!sessionId) {
+            sessionId = generateSessionId();
+            sessionStorage.setItem('sessionId', sessionId);
+        }
+        return sessionId;
+    }
+
+    function generateSessionId() {
+        return uuid.v4();
+    }
+
     async function sendServerMessage(usermessage) {
         try {
             debugger;
+
+            const sessionId = getSessionId();
+
             const response = await fetch('https://ai-customer-chatbot.ue.r.appspot.com/dialogflow/detectIntent', {
                 method: 'POST',
                 headers: {
@@ -177,6 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'Referer': 'http: //localhost/'
                 },
                 body: JSON.stringify({
+                    sessionId: sessionId,
                     queryResult: {
                         queryText: usermessage
                     }
@@ -184,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             const result = await response.json();
             if (result.quickReplies) {
-                displayQuickReplies(result.quickReplies,result.requestAppendMessage);
+                displayQuickReplies(result.quickReplies, result.requestAppendMessage);
             }
             if (result.fulfillmentText && result.fulfillmentText.length > 0) {
                 result.fulfillmentText.forEach(msg => {
@@ -197,36 +215,71 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function displayQuickReplies(quickRepliesList,requestText) {
-        debugger;
-        // Get the div element where the ordered list will be added
-        //const quickRepliesContainer = document.getElementById("quick-replies");
-        quickReplies.innerHTML = ""; // Clear any existing content
+    // function displayQuickReplies(quickRepliesList, requestText) {
+    //     debugger;
+    //     // Get the div element where the ordered list will be added
+    //     //const quickRepliesContainer = document.getElementById("quick-replies");
+    //     quickReplies.innerHTML = ""; // Clear any existing content
+    //     showQuickReplies();
+    //     // Create an ordered list element
+    //     const ol = document.createElement("ol");
+    //     ol.id = "quick-replies-list"; // Optional: Add an ID to the <ol> for styling
+
+    //     // Loop through the quickReplies array and create <li> elements for each reply
+    //     quickRepliesList.forEach(reply => {
+    //         const listItem = document.createElement("li");
+    //         listItem.textContent = reply;
+    //         listItem.classList.add("quick-reply-button");
+
+    //         // Add an event listener for when the user clicks on the list item
+    //         listItem.addEventListener("click", () => {
+    //             handleQuickReplyClick(reply, requestText);
+    //         });
+
+    //         // Append the list item to the ordered list
+    //         ol.appendChild(listItem);
+    //     });
+
+    //     // Append the ordered list to the div
+    //     quickReplies.appendChild(ol);
+    // }
+
+    function displayQuickReplies(quickRepliesList, requestText) {
+        // Clear any existing content
+        quickReplies.innerHTML = ""; 
         showQuickReplies();
-        // Create an ordered list element
-        const ol = document.createElement("ol");
-        ol.id = "quick-replies-list"; // Optional: Add an ID to the <ol> for styling
-
-        // Loop through the quickReplies array and create <li> elements for each reply
+    
+        // Create a container div for the quick replies
+        const quickRepliesContainer = document.createElement("div");
+        quickRepliesContainer.id = "quick-replies"; // Optional: Add an ID for styling
+    
+        // Apply the quick-replies CSS styles
+        quickRepliesContainer.style.display = "flex";          // Enables Flexbox layout
+        quickRepliesContainer.style.flexWrap = "wrap";         // Allows buttons to wrap to the next line
+        quickRepliesContainer.style.padding = "10px";          // Adds space around the container content
+        quickRepliesContainer.style.backgroundColor = "#f8f9fa"; // Background color for the quick replies area
+        quickRepliesContainer.style.borderTop = "1px solid #e0e0e0"; // Optional: Top border for separation
+    
+        // Loop through the quickReplies array and create buttons for each reply
         quickRepliesList.forEach(reply => {
-            const listItem = document.createElement("li");
-            listItem.textContent = reply;
-            listItem.classList.add("quick-reply-button");
-
-            // Add an event listener for when the user clicks on the list item
-            listItem.addEventListener("click", () => {
-                handleQuickReplyClick(reply,requestText);
+            const button = document.createElement("button");
+            button.textContent = reply;
+            button.classList.add("quick-reply-button");
+    
+            // Add an event listener for when the user clicks on the button
+            button.addEventListener("click", () => {
+                handleQuickReplyClick(reply, requestText);
             });
-
-            // Append the list item to the ordered list
-            ol.appendChild(listItem);
+    
+            // Append the button to the container
+            quickRepliesContainer.appendChild(button);
         });
-
-        // Append the ordered list to the div
-        quickReplies.appendChild(ol);
+    
+        // Append the container to the quickReplies div
+        quickReplies.appendChild(quickRepliesContainer);
     }
 
-    function handleQuickReplyClick(reply,requestText) {
+    function handleQuickReplyClick(reply, requestText) {
         debugger;
         appendMessage(reply, MessageType.user);
         hideQuickReplies(); // Hide quick replies after a selection
@@ -237,36 +290,36 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 1500);
     }
 
-    function displayProductInfoFromText(responseText) {
-        const messageContainer = document.getElementById('message-container');
+    // function displayProductInfoFromText(responseText) {
+    //     const messageContainer = document.getElementById('message-container');
 
-        // Define the regex patterns for each piece of information
-        const descriptionPattern = /- \*\*Description:\*\* (.*?) - \*\*Price:\*\*/;
-        const pricePattern = /- \*\*Price:\*\* (.*?) - \*\*Availability:\*\*/;
-        const availabilityPattern = /- \*\*Availability:\*\* (\d+)/;
+    //     // Define the regex patterns for each piece of information
+    //     const descriptionPattern = /- \*\*Description:\*\* (.*?) - \*\*Price:\*\*/;
+    //     const pricePattern = /- \*\*Price:\*\* (.*?) - \*\*Availability:\*\*/;
+    //     const availabilityPattern = /- \*\*Availability:\*\* (\d+)/;
 
-        // Extract the information using the regex patterns
-        const description = (responseText.match(descriptionPattern) || [])[1] || "No description available.";
-        const price = (responseText.match(pricePattern) || [])[1] || "N/A";
-        const availability = (responseText.match(availabilityPattern) || [])[1] || "N/A";
+    //     // Extract the information using the regex patterns
+    //     const description = (responseText.match(descriptionPattern) || [])[1] || "No description available.";
+    //     const price = (responseText.match(pricePattern) || [])[1] || "N/A";
+    //     const availability = (responseText.match(availabilityPattern) || [])[1] || "N/A";
 
-        // Create the HTML structure dynamically
-        const productInfoHtml = `
-            <div class="product-info">
-                <p><strong>Description:</strong> ${description}</p>
-                <p><strong>Price:</strong> ${price}</p>
-                <p><strong>Availability:</strong> ${availability}</p>
-                <p>Would you like to purchase this product, or go back to the product list?</p>
-            </div>
-        `;
+    //     // Create the HTML structure dynamically
+    //     const productInfoHtml = `
+    //         <div class="product-info">
+    //             <p><strong>Description:</strong> ${description}</p>
+    //             <p><strong>Price:</strong> ${price}</p>
+    //             <p><strong>Availability:</strong> ${availability}</p>
+    //             <p>Would you like to purchase this product, or go back to the product list?</p>
+    //         </div>
+    //     `;
 
-        // Create a container for the message and append it to the message container
-        const messageElement = document.createElement('div');
-        messageElement.innerHTML = productInfoHtml;
-        messageContainer.appendChild(messageElement);
+    //     // Create a container for the message and append it to the message container
+    //     const messageElement = document.createElement('div');
+    //     messageElement.innerHTML = productInfoHtml;
+    //     messageContainer.appendChild(messageElement);
 
-        // Scroll to the bottom of the chat window to show the new message
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-    }
+    //     // Scroll to the bottom of the chat window to show the new message
+    //     messageContainer.scrollTop = messageContainer.scrollHeight;
+    // }
 
 });
