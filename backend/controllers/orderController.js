@@ -3,6 +3,10 @@
 const { text } = require('body-parser');
 const { db } = require('../config/dbConfig');
 const logger = require('../utils/logger');
+const constants = require('../utils/constants');
+
+const OrderNotFoundQuickReplies = constants.buildDynamicQuickReplies(["Re-enter Order Number","Return to main menu","Speak to customer support"]).payload;
+const OrderFoundQuickReplies = constants.buildDynamicQuickReplies(["Track another order","Return to main menu"]).payload;
 
 const orderstatus = async (req, res) => {
   logger.info(`Received orderstatus API request ${JSON.stringify(req.body)}`);
@@ -45,26 +49,27 @@ const buildOrderTrackResponse = (order) => ({
       },
       {
         "responseType": "ENTRY_PROMPT",
-        "payload": {
-          "richContent": [
-            [
-              {
-                "type": "chips",
-                "options": [
-                  {
-                    "text": "Track another order"
-                  },
-                  {
-                    "text": "Return to main menu"
-                  },
-                  {
-                    "text": "Speak to customer support"
-                  }
-                ]
-              }
-            ]
-          ]
-        }
+        "payload": OrderFoundQuickReplies
+        // {
+        //   "richContent": [
+        //     [
+        //       {
+        //         "type": "chips",
+        //         "options": [
+        //           {
+        //             "text": "Track another order"
+        //           },
+        //           {
+        //             "text": "Return to main menu"
+        //           },
+        //           // {
+        //           //   "text": "Speak to customer support"
+        //           // }
+        //         ]
+        //       }
+        //     ]
+        //   ]
+        // }
       }
     ]
   }
@@ -86,7 +91,32 @@ const buildNoOrderResponse = () => ({
              </div>`
           ]
         }
+      },
+      {
+        responseType: "ENTRY_PROMPT",
+        "payload": OrderNotFoundQuickReplies
+        // {
+        //   "richContent": [
+        //     [
+        //       {
+        //         "type": "chips",
+        //         "options": [
+        //           {
+        //             "text": "Re-enter Order Number"
+        //           },
+        //           {
+        //             "text": "Return to main menu"
+        //           },
+        //           {
+        //             "text": "Speak to customer support"
+        //           }
+        //         ]
+        //       }
+        //     ]
+        //   ]
+        // }
       }
+
     ]
   }
 });

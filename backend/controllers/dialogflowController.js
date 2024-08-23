@@ -79,8 +79,8 @@ const detectIntent = async (req, res) => {
       }
     });
     
-    logger.info(`creating quick replies ${quickReplies}`);
-    logger.info(`creating append text ${reqAppMessage}`);
+    logger.info(`creating quick replies ${JSON.stringify(quickReplies)}`);
+    logger.info(`creating append text ${JSON.stringify(reqAppMessage)}`);
     res.json({
       fulfillmentText: responseText,
       quickReplies: quickReplies,

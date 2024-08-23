@@ -9,5 +9,22 @@ const intentTrainingPhraseType = {
     projmca_intent_welcome: '',
     projmca_intent_negative: ''
   };
+
+  function buildDynamicQuickReplies(options) {
+    return {
+      payload: {
+        richContent: [
+          [
+            {
+              type: "chips",
+              options: options.map(option => ({
+                text: option
+              }))
+            }
+          ]
+        ]
+      }
+    };
+  }
   
-  module.exports = intentTrainingPhraseType;
+  module.exports = { intentTrainingPhraseType, buildDynamicQuickReplies };
