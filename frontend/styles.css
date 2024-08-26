@@ -212,15 +212,16 @@ body, html {
 }
 
 /* Quick replies section */
-/* Quick replies section */
 #quick-replies {
     padding: 10px;
-    background-color: #f8f9fa; /* Maintain your existing background color */
+    background-color: #f8f9fa;
     display: flex;
-    justify-content: flex-start; /* Align the items to the left */
-    flex-wrap: wrap; /* Allow the buttons to wrap to the next line */
-    gap: 10px; /* Adds space between buttons */
-    border-top: 1px solid #e0e0e0; /* Maintain the top border */
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-top: none; /* Remove top border if still there */
+    padding-top: 0; /* Adjust padding as needed */
+    /* Remove the border-top property */
 }
 
 .quick-reply-button {
@@ -304,4 +305,150 @@ body, html {
 /* Hide elements when necessary */
 .hidden {
     display: none;
+}
+
+.message {
+    margin-bottom: 0; /* Adjust margin as needed */
+    border: none; /* Remove any border */
+    /* margin-bottom: 20px;*/
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Style for the carousel container */
+/* Hide scrollbar but allow scrolling */
+.carousel {
+    display: flex;
+    overflow-x: scroll; /* Allows horizontal scrolling */
+    flex-grow: 1;
+    padding: 10px;
+    gap: 10px;
+    scroll-behavior: smooth;
+    justify-content: space-between;
+    background-color: transparent;
+    scrollbar-width: none; /* For Firefox */
+    -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+}
+
+.carousel::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
+}
+  
+  /* Style for each carousel item */
+  .carousel-item {
+    flex: 0 0 calc(50% - 20px); /* Adjust width to 50% minus total padding/margin */
+    max-width: calc(50% - 20px); /* Ensures the max width doesn't exceed half of the container */
+    height: 300px; /* Set a fixed height for the carousel items */
+    margin: 0; /* Removes margin as we are using gap in the parent */
+    border: 1px solid #ddd; /* Adds a light border for separation */
+    border-radius: 8px; /* Adds rounded corners */
+    overflow: hidden; /* Ensures content doesn't overflow */
+    background-color: #fff; /* Background color for the cards */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    display: flex;
+    flex-direction: column; /* Arrange elements vertically */
+    justify-content: space-between; /* Distributes space between elements */
+    padding: 10px; /* Adds padding inside each carousel item */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover transition */
+  }
+  
+  /* Hover effect for carousel items */
+  .carousel-item:hover {
+    transform: translateY(-5px); /* Slight lift on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* More prominent shadow on hover */
+  }
+  
+  /* Image styling within carousel items */
+  .carousel-img-container {
+    height: 150px; /* Sets a specific height for the image container */
+    overflow: hidden; /* Ensures that the image doesn't overflow the container */
+    display: flex;
+    align-items: center; /* Vertically centers the image */
+    justify-content: center; /* Horizontally centers the image */
+    padding: 5px; /* Adds padding around the image */
+  }
+  
+  .carousel-image {
+    max-width: 100%; /* Ensures the image takes the full width of the container */
+    max-height: 100%; /* Ensures the image doesn't exceed the container's height */
+    object-fit: cover; /* Ensures the image covers the area while maintaining its aspect ratio */
+    display: block; /* Prevents extra space below the image */
+  }
+  
+  /* Text content within the carousel items */
+  .carousel-title {
+    font-size: 14px; /* Adjust font size as needed */
+    margin: 10px 0; /* Adds spacing around the title */
+    text-align: center; /* Centers the title text */
+  }
+  
+  .carousel-description {
+    font-size: 12px; /* Smaller font size for the description */
+    margin: 10px 0; /* Adds spacing around the description */
+    text-align: center; /* Centers the description text */
+  }
+  
+  /* Button styling within the carousel items */
+  .button-container {
+    display: flex;
+    justify-content: center; /* Centers the buttons */
+    margin-top: auto; /* Pushes the buttons to the bottom */
+    padding-bottom: 10px; /* Adds spacing below the buttons */
+  }
+  
+  .carousel-button {
+    background-color: #007bff; /* Button background color */
+    color: #fff; /* Button text color */
+    padding: 5px 10px; /* Adds padding to the button */
+    margin: 5px; /* Adds spacing around the buttons */
+    border: none; /* Removes the default button border */
+    border-radius: 4px; /* Adds rounded corners to the button */
+    cursor: pointer; /* Changes the cursor to a pointer on hover */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .carousel-button:hover {
+    background-color: #0056b3; /* Darkens the button on hover */
+  }
+
+  .carousel-container {
+    position: relative; /* Position relative for absolute positioned arrows */
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.carousel {
+    display: flex;
+    overflow-x: auto; /* Enables horizontal scrolling */
+    flex-grow: 1;
+    padding: 10px;
+    gap: 10px;
+    scroll-behavior: smooth;
+    justify-content: space-between;
+    background-color: transparent;
+}
+
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+    user-select: none; /* Prevents text selection */
+}
+
+.left-arrow {
+    left: 0;
+    margin-left: 5px;
+}
+
+.right-arrow {
+    right: 0;
+    margin-right: 5px;
 }

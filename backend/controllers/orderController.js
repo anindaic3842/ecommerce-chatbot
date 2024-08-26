@@ -6,7 +6,7 @@ const logger = require('../utils/logger');
 const constants = require('../utils/constants');
 
 const OrderNotFoundQuickReplies = constants.buildDynamicQuickReplies(["Re-enter Order Number","Return to main menu","Speak to customer support"]).payload;
-const OrderFoundQuickReplies = constants.buildDynamicQuickReplies(["Track another order","Return to main menu"]).payload;
+const OrderFoundQuickReplies = constants.buildDynamicQuickReplies(["Return to main menu"]).payload;
 
 const orderstatus = async (req, res) => {
   logger.info(`Received orderstatus API request ${JSON.stringify(req.body)}`);
@@ -50,26 +50,6 @@ const buildOrderTrackResponse = (order) => ({
       {
         "responseType": "ENTRY_PROMPT",
         "payload": OrderFoundQuickReplies
-        // {
-        //   "richContent": [
-        //     [
-        //       {
-        //         "type": "chips",
-        //         "options": [
-        //           {
-        //             "text": "Track another order"
-        //           },
-        //           {
-        //             "text": "Return to main menu"
-        //           },
-        //           // {
-        //           //   "text": "Speak to customer support"
-        //           // }
-        //         ]
-        //       }
-        //     ]
-        //   ]
-        // }
       }
     ]
   }
@@ -95,26 +75,6 @@ const buildNoOrderResponse = () => ({
       {
         responseType: "ENTRY_PROMPT",
         "payload": OrderNotFoundQuickReplies
-        // {
-        //   "richContent": [
-        //     [
-        //       {
-        //         "type": "chips",
-        //         "options": [
-        //           {
-        //             "text": "Re-enter Order Number"
-        //           },
-        //           {
-        //             "text": "Return to main menu"
-        //           },
-        //           {
-        //             "text": "Speak to customer support"
-        //           }
-        //         ]
-        //       }
-        //     ]
-        //   ]
-        // }
       }
 
     ]

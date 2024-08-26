@@ -8,6 +8,8 @@ const logger = require('./utils/logger');
 const dialogflowRoutes = require('./routes/dialogflowRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const dealsRoutes = require('./routes/dealsRoutes');
+const commonRoutes = require('./routes/commonRoutes');
 // Import other routes as needed
 
 // Middleware setup
@@ -22,6 +24,8 @@ app.use(cors({
 app.use('/dialogflow', dialogflowRoutes);
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+app.use('/deals', dealsRoutes);
+app.use('/common', commonRoutes);
 // Add other routes as needed
 
 app.get('/', (req, res) => {
@@ -35,7 +39,7 @@ async function run() {
 
     const PORT = process.env.PORT || 50000;
     app.options('*', cors());
-    app.options('/detectIntent', cors());
+    app.options('dialogflow/detectIntent', cors());
 
     app.listen(PORT, () => {
       logger.info(`Chatbot - Server is running on port ${PORT}`);

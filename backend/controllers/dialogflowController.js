@@ -1,5 +1,6 @@
 //Handles all Dialogflow-related requests.
 // dialogflowController.js
+const { log } = require('winston');
 const { sessionClient, sessionId, projectId, locationId, agentId, languageCd } = require('../config/dialogflowConfig');
 const logger = require('../utils/logger');
 const currentPageInFlow = {
@@ -38,6 +39,7 @@ const detectIntent = async (req, res) => {
 
   try {
     let quickReplies = [];
+    let carouselData = [];
     const responses = await sessionClient.detectIntent(request);
     logger.info(`response body - ${JSON.stringify(responses[0])}`);
     
@@ -51,7 +53,7 @@ const detectIntent = async (req, res) => {
     if (responseMessages && responseMessages.length > 0) {
       responseMessages.forEach(message => {
         if (message.text && message.text.text) {
-          responseText.push(message.text.text);
+          responseText.push(message.text.text[0]);
         }
       });
 
@@ -74,21 +76,53 @@ const detectIntent = async (req, res) => {
                 quickReplies.push(option.structValue.fields.text.stringValue);
               });
             }
+            else if (itemFields.type.stringValue === "carousel-card") {
+              logger.info(`inside loop for carousel - ${JSON.stringify(itemFields)}`);
+              logger.info(`inside loop for carousel buttoin data- ${JSON.stringify(itemFields.buttons.listValue.values)}`);
+              // Correctly parse the buttons array using map
+              const buttonData = itemFields.buttons.listValue.values.map((btn) => {
+                return {
+                  text: btn.structValue.fields.text.stringValue,
+                  link: btn.structValue.fields.link.stringValue
+                };
+              });
+              // Handling "carousel"
+              const carouselItem = {
+                type: itemFields.type.stringValue,
+                title: itemFields.title.stringValue,
+                description: itemFields.description.stringValue,
+                image: itemFields.image.stringValue,
+                actionLink: itemFields.link.stringValue,
+                buttons: buttonData,
+              };
+              carouselData.push(carouselItem);
+              logger.info(`carousel items end loop data ${JSON.stringify(carouselItem)}`);
+            }
           });
         });
       }
     });
+
+    //add the carousel data to the response
+    if (carouselData.length > 0) {
+      responseText.push({
+        type: "carousel-card",
+        items: carouselData
+      });
+    }
     
     logger.info(`creating quick replies ${JSON.stringify(quickReplies)}`);
+    logger.info(`carousal data ${JSON.stringify(carouselData)}`);
     logger.info(`creating append text ${JSON.stringify(reqAppMessage)}`);
     res.json({
       fulfillmentText: responseText,
       quickReplies: quickReplies,
+      carouselData: carouselData,
       requestAppendMessage: currentPageInFlow[reqAppMessage] || '',
       sessionId: sessionId
     });
   } catch (error) {
-    logger.error(`detectIntent error - ${ JSON.stringify(error.message) }`);
+    logger.error(`detectIntent error - ${ JSON.stringify(error.message) } - ${ JSON.stringify(error.stack) }`);
     res.status(500).send('Error processing request');
     //throw error;
   }

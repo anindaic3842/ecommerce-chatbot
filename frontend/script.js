@@ -56,21 +56,306 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 1500); // Simulate delay for bot processing
     }
 
-    // Append message to the chat window
-    function appendMessage(text, className) {
-        const messageElement = document.createElement('div');
-        messageElement.className = `message ${className}`;
+    // // Append message to the chat window
+    // function appendMessage(text, className) {
+    //     const messageElement = document.createElement('div');
+    //     messageElement.className = `message ${className}`;
 
+    //     if (isHTML(text)) {
+    //         messageElement.innerHTML = text; // Render as HTML
+    //     } else {
+    //         messageElement.textContent = text; // Render as plain text
+    //     }
+
+    //     //messageElement.textContent = text;
+    //     messageContainer.appendChild(messageElement);
+    //     scrollToBottom();
+    // }
+
+        // Append message to the chat window
+    // function appendMessage(text, className) {
+    //     debugger;
+    //     const messageElement = document.createElement('div');
+    //     messageElement.className = `message ${className}`;
+
+    //     if (typeof text === 'string') {
+    //         if (isHTML(text)) {
+    //             messageElement.innerHTML = text; // Render as HTML
+    //         }
+    //         else {
+    //             messageElement.textContent = text; // Render as plain text
+    //         }
+    //     } else if (typeof text === 'object') {
+    //         if (text.type === 'carousel-card') {
+    //             //render as a carousel
+    //             const carousel = document.createElement('div');
+    //             carousel.className = 'carousel';
+
+    //             text.items.forEach(item => {
+    //                 const carouselItem = document.createElement('div');
+    //                 carouselItem.className = 'carousel-item';
+
+    //                 // const img = document.createElement('img');
+    //                 // img.src = item.image.src.rawUrl;
+    //                 // carouselItem.appendChild(img);
+
+    //                 const title = document.createElement('h4');
+    //                 title.textContent = item.title;
+    //                 carouselItem.appendChild(title);
+
+    //                 const description = document.createElement('p');
+    //                 description.textContent = item.description;
+    //                 carouselItem.appendChild(description);
+
+    //                 const link = document.createElement('a');
+    //                 link.href = item.actionLink;
+    //                 link.textContent = 'Learn More';
+    //                 link.target = '_blank';
+    //                 carouselItem.appendChild(link);
+
+    //                 carousel.appendChild(carouselItem);
+    //             });
+    //             messageElement.appendChild(carousel);
+    //         }
+    //     }
+
+    //     //messageElement.textContent = text;
+    //     messageContainer.appendChild(messageElement);
+    //     scrollToBottom();
+    // }
+    // function appendMessage(text, className) {
+    //     debugger;
+    //     const messageElement = document.createElement('div');
+    //     if (typeof text === 'string') {
+    //         messageElement.className = `message ${className}`;
+    //         if (isHTML(text)) {
+    //             messageElement.innerHTML = text; // Render as HTML
+    //         } else {
+    //             messageElement.textContent = text; // Render as plain text
+    //         }
+    //     } else if (typeof text === 'object') {
+    //         if (text.type === 'carousel-card') {
+    //             // Render as a carousel
+    //             const carousel = document.createElement('div');
+    //             carousel.className = 'carousel';
+    
+    //             text.items.forEach(item => {
+    //                 const carouselItem = document.createElement('div');
+    //                 carouselItem.className = 'carousel-item';
+    
+    //                 // Image
+    //                 const imgContainer = document.createElement('div');
+    //                 imgContainer.className = 'carousel-img-container';
+                    
+    //                 const img = document.createElement('img');
+    //                 img.src = item.image;
+    //                 img.alt = item.title;
+    //                 img.className = 'carousel-image';
+    //                 imgContainer.appendChild(img);
+    //                 carouselItem.appendChild(imgContainer);
+    
+    //                 // Title
+    //                 const title = document.createElement('h4');
+    //                 title.textContent = item.title;
+    //                 title.className = 'carousel-title';
+    //                 carouselItem.appendChild(title);
+    
+    //                 // Description
+    //                 const description = document.createElement('p');
+    //                 description.textContent = item.description;
+    //                 description.className = 'carousel-description';
+    //                 carouselItem.appendChild(description);
+    
+    //                 // Buttons
+    //                 const buttonContainer = document.createElement('div');
+    //                 buttonContainer.className = 'button-container';
+    
+    //                 item.buttons.forEach(button => {
+    //                     const buttonElement = document.createElement('button');
+    //                     buttonElement.textContent = button.text;
+    //                     buttonElement.className = 'carousel-button';
+    //                     buttonElement.onclick = () => {
+    //                         window.open(button.link, '_blank');
+    //                     };
+    //                     buttonContainer.appendChild(buttonElement);
+    //                 });
+    
+    //                 carouselItem.appendChild(buttonContainer);
+    //                 carousel.appendChild(carouselItem);
+    //             });
+    
+    //             messageElement.appendChild(carousel);
+    //         }
+    //     }
+    
+    //     messageContainer.appendChild(messageElement);
+    //     scrollToBottom();
+    // }
+
+//     function appendMessage(text, className) {
+//         const messageElement = document.createElement('div');
+
+//         if (typeof text === 'string') {
+//             messageElement.className = `message ${className}`;
+//             if (isHTML(text)) {
+//                 messageElement.innerHTML = text; // Render as HTML
+//             } else {
+//                 messageElement.textContent = text; // Render as plain text
+//             }
+//         } else if (typeof text === 'object') {
+//             if (text.type === 'carousel-card') {
+//                 // Render as a carousel
+//                 const carousel = document.createElement('div');
+//                 carousel.className = 'carousel';
+
+//                 text.items.forEach(item => {
+//                     const carouselItem = document.createElement('div');
+//                     carouselItem.className = 'carousel-item';
+
+//                     // Image
+//                     const imgContainer = document.createElement('div');
+//                     imgContainer.className = 'carousel-img-container';
+
+//                     const img = document.createElement('img');
+//                     img.src = item.image;
+//                     img.alt = item.title;
+//                     img.className = 'carousel-image';
+//                     imgContainer.appendChild(img);
+//                     carouselItem.appendChild(imgContainer);
+
+//                     // Title
+//                     const title = document.createElement('h4');
+//                     title.textContent = item.title;
+//                     title.className = 'carousel-title';
+//                     carouselItem.appendChild(title);
+
+//                     // Description
+//                     const description = document.createElement('p');
+//                     description.textContent = item.description;
+//                     description.className = 'carousel-description';
+//                     carouselItem.appendChild(description);
+
+//                     // Buttons
+//                     const buttonContainer = document.createElement('div');
+//                     buttonContainer.className = 'button-container';
+
+//                     item.buttons.forEach(button => {
+//                         const buttonElement = document.createElement('button');
+//                         buttonElement.textContent = button.text;
+//                         buttonElement.className = 'carousel-button';
+//                         buttonElement.onclick = () => {
+//                             window.open(button.link, '_blank');
+//                         };
+//                         buttonContainer.appendChild(buttonElement);
+//                     });
+
+//                     carouselItem.appendChild(buttonContainer);
+//                     carousel.appendChild(carouselItem);
+//                 });
+
+//                 messageElement.appendChild(carousel);
+//             }
+//         }
+
+//     messageContainer.appendChild(messageElement);
+//     scrollToBottom();
+// }
+
+function appendMessage(text, className) {
+    const messageElement = document.createElement('div');
+
+    if (typeof text === 'string') {
+        messageElement.className = `message ${className}`;
         if (isHTML(text)) {
             messageElement.innerHTML = text; // Render as HTML
         } else {
             messageElement.textContent = text; // Render as plain text
         }
+    } else if (typeof text === 'object') {
+        if (text.type === 'carousel-card') {
+            // Create carousel container
+            const carouselContainer = document.createElement('div');
+            carouselContainer.className = 'carousel-container';
 
-        //messageElement.textContent = text;
-        messageContainer.appendChild(messageElement);
-        scrollToBottom();
+            // Render as a carousel
+            const carousel = document.createElement('div');
+            carousel.className = 'carousel';
+            carouselContainer.appendChild(carousel);
+
+            text.items.forEach(item => {
+                const carouselItem = document.createElement('div');
+                carouselItem.className = 'carousel-item';
+
+                // Image
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'carousel-img-container';
+
+                const img = document.createElement('img');
+                img.src = item.image;
+                img.alt = item.title;
+                img.className = 'carousel-image';
+                imgContainer.appendChild(img);
+                carouselItem.appendChild(imgContainer);
+
+                // Title
+                const title = document.createElement('h4');
+                title.textContent = item.title;
+                title.className = 'carousel-title';
+                carouselItem.appendChild(title);
+
+                // Description
+                const description = document.createElement('p');
+                description.textContent = item.description;
+                description.className = 'carousel-description';
+                carouselItem.appendChild(description);
+
+                // Buttons
+                const buttonContainer = document.createElement('div');
+                buttonContainer.className = 'button-container';
+
+                item.buttons.forEach(button => {
+                    const buttonElement = document.createElement('button');
+                    buttonElement.textContent = button.text;
+                    buttonElement.className = 'carousel-button';
+                    buttonElement.onclick = () => {
+                        window.open(button.link, '_blank');
+                    };
+                    buttonContainer.appendChild(buttonElement);
+                });
+
+                carouselItem.appendChild(buttonContainer);
+                carousel.appendChild(carouselItem);
+            });
+
+            // Left arrow button
+            const leftArrow = document.createElement('div');
+            leftArrow.className = 'carousel-arrow left-arrow';
+            leftArrow.innerHTML = '&#9664;'; // Unicode for left arrow
+            leftArrow.onclick = () => {
+                carousel.scrollBy({ left: -carousel.clientWidth / 2, behavior: 'smooth' });
+            };
+
+            // Right arrow button
+            const rightArrow = document.createElement('div');
+            rightArrow.className = 'carousel-arrow right-arrow';
+            rightArrow.innerHTML = '&#9654;'; // Unicode for right arrow
+            rightArrow.onclick = () => {
+                carousel.scrollBy({ left: carousel.clientWidth / 2, behavior: 'smooth' });
+            };
+
+            // Append arrows to the carousel container
+            carouselContainer.appendChild(leftArrow);
+            carouselContainer.appendChild(rightArrow);
+
+            // Append the carousel container to the message element
+            messageElement.appendChild(carouselContainer);
+        }
     }
+
+    messageContainer.appendChild(messageElement);
+    scrollToBottom();
+}
+
     // This function is to detect whether the content is plain text or HTML text
     function isHTML(content) {
         const parser = new DOMParser();
@@ -215,35 +500,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // function displayQuickReplies(quickRepliesList, requestText) {
-    //     debugger;
-    //     // Get the div element where the ordered list will be added
-    //     //const quickRepliesContainer = document.getElementById("quick-replies");
-    //     quickReplies.innerHTML = ""; // Clear any existing content
-    //     showQuickReplies();
-    //     // Create an ordered list element
-    //     const ol = document.createElement("ol");
-    //     ol.id = "quick-replies-list"; // Optional: Add an ID to the <ol> for styling
-
-    //     // Loop through the quickReplies array and create <li> elements for each reply
-    //     quickRepliesList.forEach(reply => {
-    //         const listItem = document.createElement("li");
-    //         listItem.textContent = reply;
-    //         listItem.classList.add("quick-reply-button");
-
-    //         // Add an event listener for when the user clicks on the list item
-    //         listItem.addEventListener("click", () => {
-    //             handleQuickReplyClick(reply, requestText);
-    //         });
-
-    //         // Append the list item to the ordered list
-    //         ol.appendChild(listItem);
-    //     });
-
-    //     // Append the ordered list to the div
-    //     quickReplies.appendChild(ol);
-    // }
-
     function displayQuickReplies(quickRepliesList, requestText) {
         // Clear any existing content
         quickReplies.innerHTML = ""; 
@@ -289,37 +545,5 @@ document.addEventListener('DOMContentLoaded', function () {
             hideTypingIndicator(); // Hide typing indicator after bot responds
         }, 1500);
     }
-
-    // function displayProductInfoFromText(responseText) {
-    //     const messageContainer = document.getElementById('message-container');
-
-    //     // Define the regex patterns for each piece of information
-    //     const descriptionPattern = /- \*\*Description:\*\* (.*?) - \*\*Price:\*\*/;
-    //     const pricePattern = /- \*\*Price:\*\* (.*?) - \*\*Availability:\*\*/;
-    //     const availabilityPattern = /- \*\*Availability:\*\* (\d+)/;
-
-    //     // Extract the information using the regex patterns
-    //     const description = (responseText.match(descriptionPattern) || [])[1] || "No description available.";
-    //     const price = (responseText.match(pricePattern) || [])[1] || "N/A";
-    //     const availability = (responseText.match(availabilityPattern) || [])[1] || "N/A";
-
-    //     // Create the HTML structure dynamically
-    //     const productInfoHtml = `
-    //         <div class="product-info">
-    //             <p><strong>Description:</strong> ${description}</p>
-    //             <p><strong>Price:</strong> ${price}</p>
-    //             <p><strong>Availability:</strong> ${availability}</p>
-    //             <p>Would you like to purchase this product, or go back to the product list?</p>
-    //         </div>
-    //     `;
-
-    //     // Create a container for the message and append it to the message container
-    //     const messageElement = document.createElement('div');
-    //     messageElement.innerHTML = productInfoHtml;
-    //     messageContainer.appendChild(messageElement);
-
-    //     // Scroll to the bottom of the chat window to show the new message
-    //     messageContainer.scrollTop = messageContainer.scrollHeight;
-    // }
 
 });

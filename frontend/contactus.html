@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .contact-form {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        .contact-form h2 {
+            margin-bottom: 20px;
+            color: #333333;
+        }
+        .contact-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555555;
+        }
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #dddddd;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #333333;
+        }
+        .contact-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .contact-form button:hover {
+            background-color: #0056b3;
+        }
+        .contact-form .success-message {
+            display: none;
+            color: green;
+            margin-bottom: 20px;
+        }
+        .contact-form .error-message {
+            display: none;
+            color: red;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="contact-form">
+    <h2>Contact Us</h2>
+    <form id="contactForm">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" name="name" required>
+        
+        <label for="email">Your Email</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="message">Your Message</label>
+        <textarea id="message" name="message" rows="4" required></textarea>
+        
+        <button type="submit">Send Message</button>
+        
+        <div class="success-message">Your message has been sent successfully!</div>
+        <div class="error-message">There was an error sending your message. Please try again.</div>
+    </form>
+</div>
+
+<script>
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent the default form submission
+
+        // Function to get or create the session ID
+        function getSessionId() {
+        let sessionId = sessionStorage.getItem('sessionId');
+        if (!sessionId) {
+            sessionId = generateSessionId();
+            sessionStorage.setItem('sessionId', sessionId);
+        }
+        return sessionId;
+    }
+
+    function generateSessionId() {
+        return uuid.v4();
+    }
+
+    const formData = new FormData(this);
+        // Debug: Log each form data entry to console
+        for (let [key, value] of formData.entries()) {
+        console.log(key, value); // Log the key-value pairs
+    }
+
+
+    debugger;
+    const sessionId = getSessionId();
+
+    fetch('https://ai-customer-chatbot.ue.r.appspot.com/common/contactinfo', 
+    {
+        method: 'POST',
+        headers: {
+                    'Content-Type': 'application/json',
+                    //'Origin': 'http: //localhost',
+                    //'Referer': 'http: //localhost/'
+                },
+        body: JSON.stringify({
+                    sessionId: sessionId,
+                    contactus: Object.fromEntries(formData.entries())
+                })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.querySelector('.success-message').style.display = 'block';
+            document.querySelector('.error-message').style.display = 'none';
+            this.reset(); // Clear the form fields
+        } else {
+            document.querySelector('.success-message').style.display = 'none';
+            document.querySelector('.error-message').style.display = 'block';
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        document.querySelector('.success-message').style.display = 'none';
+        document.querySelector('.error-message').style.display = 'block';
+    });
+});
+</script>
+
+</body>
+</html>
