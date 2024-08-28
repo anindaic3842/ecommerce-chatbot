@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>E-commerce Chatbot UI</title>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="styles.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-commerce Chatbot UI</title>
+    <!-- Google Fonts for Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Link to External CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
 <body>
+    <!-- Main Chatbot Container -->
     <div id="chatbot-container">
-        <!-- Header -->
+        <!-- Chat Header -->
         <div id="chat-header">
             <div id="header-content">
                 <div id="bot-avatar">
@@ -27,12 +30,12 @@
             </div>
         </div>
 
-        <!-- Main Chat Area -->
+        <!-- Chat Window (Main Area for Messages) -->
         <div id="chat-window">
             <div id="message-container">
                 <!-- Placeholder for dynamic messages -->
             </div>
-            <!-- Typing Indicator at the Bottom -->
+            <!-- Typing Indicator -->
             <div id="typing-indicator" class="hidden">
                 <div class="typing-dot"></div>
                 <div class="typing-dot"></div>
@@ -42,8 +45,7 @@
 
         <!-- Quick Reply Section -->
         <div id="quick-replies" class="hidden">
-            <ol>
-              </ol>
+            <ol></ol>
         </div>
 
         <!-- Product Details Section -->
@@ -51,13 +53,13 @@
             <div class="product-details"></div>
         </div>
 
-        <!-- Input Area -->
+        <!-- Input Area for User to Type Messages -->
         <div id="input-area">
             <input type="text" id="user-input" placeholder="Ask anything...">
             <button id="send-btn">&#10148;</button>
         </div>
 
-        <!-- Feedback Form -->
+        <!-- Feedback Form for User Experience -->
         <div id="feedback-form" class="hidden">
             <p>Thanks for shopping with us!</p>
             <p>Please rate your experience below</p>
@@ -81,8 +83,10 @@
     <div id="minimized-chat-icon" class="hidden">
         <img src="assets/chatbotimage.png" alt="Chatbot Icon">
     </div>
-    <!-- Include the uuid library from a CDN -->
+
+    <!-- Include UUID Library from CDN for Unique Identifiers -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+    <!-- Include External JavaScript File -->
     <script src="script.js"></script>
 </body>
 </html>
