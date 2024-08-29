@@ -15,7 +15,8 @@ const fetchDistinctCategory = async (req, res) => {
     logger.info(`Distinct Category Search - response - ${JSON.stringify(response)}`)
     res.json(response);
   } catch (error) {
-    logger.error(`Distinct Category Search API error ${JSON.stringify(error)}`);
+    logger.error(`Distinct Category Search API error message ${JSON.stringify(error.message)}`);
+    logger.error(`Distinct Category Search API error stack ${JSON.stringify(error.stack)}`);
     res.status(500).send('Unable to process your request');
   }
 };
@@ -27,13 +28,13 @@ const fetchProductsUsingCategory = async (req, res) => {
     //const category = req.body.text;
     const category = req.body.sessionInfo.parameters.singlecategory;
     const products = await getProductsByCategory(category);
-    const quickReplyOptions = products.map(product => ({ text: product }));
+    const quickReplyOptions = products.map(product => ({ text: product._id }));
     logger.info(`Product Search for a Category API - ${JSON.stringify(quickReplyOptions)}`);
     const response = buildRichContentResponse(quickReplyOptions);
     logger.info(`ProductSearchAPI - response - ${JSON.stringify(response)}`);
     res.json(response);
   } catch (error) {
-    logger.error(`ProductSearchAPI error ${JSON.stringify(error)}`);
+    logger.error(`ProductSearchAPI error ${JSON.stringify(error.message)}`);
     res.status(500).send('Unable to process your request');
   }
 };
@@ -108,14 +109,20 @@ const handleBuyProduct = async (req, res) => {
 
 const getDistinctCategories = async () => {
   const collection = db.collection('products');
-  return await collection.distinct('category');
+  return (await collection.distinct('category')).sort();
 };
 
 const getProductsByCategory = async (category) => {
   logger.info(`Finding products for a Category - ${category}`);
   const collection = db.collection('products');
-  return await collection.distinct('product_name', { category });
-};
+  //return await collection.distinct('product_name', { category }).limit(10).sort();
+  return await collection.aggregate([
+    { $match: { category } }, // Match documents by category
+    { $group: { _id: "$product_name" } }, // Group by product_name to ensure uniqueness
+    { $sort: { _id: 1 } }, // Sort by product_name (ascending)
+    { $limit: 10 } // Limit to 10 unique products
+  ]).toArray();
+};  
 
 const getProductDetails = async (productName) => {
   logger.info(`Fetching products details for a product - ${productName}`);
@@ -156,87 +163,131 @@ const buildRichContentResponse = (options) => ({
   }
 });
 
-const buildProductDetailsResponse = (product) => ({
-  fulfillment_response: {
-    messages: [
-      {
-        responseType: "ENTRY_PROMPT",
-        type: "formattedText",
-        text: {
-          text: [
-            `<div style="font-family: Arial, sans-serif;">
+const buildProductDetailsResponse = (product) => {
+  // Determine stock status and color based on quantity
+  let stockStatus = "";
+  let stockColor = "";
+
+  if (product.quantity > 5) {
+    stockStatus = `In Stock (${product.quantity})`;
+    stockColor = "green";
+  } else if (product.quantity > 0 && product.quantity <= 5) {
+    stockStatus = `Quickly running Out of Stock (${product.quantity})`;
+    stockColor = "orange";
+  } else {
+    stockStatus = "Out of Stock";
+    stockColor = "red";
+  }
+
+  return {
+    fulfillment_response: {
+      messages: [
+        {
+          responseType: "ENTRY_PROMPT",
+          type: "formattedText",
+          text: {
+            text: [
+              `<div style="font-family: Arial, sans-serif;">
+                 <p>- <strong>Description:</strong> ${product.description}</p>
+                 <p>- <strong>Price:</strong> ${product.price}</p>
+                 <p>- <strong>Availability:</strong> 
+                   <b><span style="color: ${stockColor};">${stockStatus}</span></b>
+                 </p>
+                 <p>Would you like to purchase this product, or go back to the product list?</p>
+               </div>`
+            ]
+          }
+        },
+        {
+          responseType: "ENTRY_PROMPT",
+          payload: {
+            richContent: [
+              [
+                {
+                  type: "chips",
+                  options: [
+                    { text: "Buy" },
+                    { text: "Go back to product list" },
+                    { text: "Go back to main menu" }
+                  ]
+                }
+              ]
+            ]
+          }
+        }
+      ],
+      source: "WEBHOOK"
+    }
+  };
+};
+
+const buildProductSearchResponse = (product) => {
+
+  let stockStatus = "";
+  let stockColor = "";
+
+  if (product.quantity > 5) {
+    stockStatus = `In Stock (${product.quantity})`;
+    stockColor = "green";
+  } else if (product.quantity > 0 && product.quantity <= 5) {
+    stockStatus = `Quickly running Out of Stock (${product.quantity})`;
+    stockColor = "orange";
+  } else {
+    stockStatus = "Out of Stock";
+    stockColor = "red";
+  }
+
+  return {
+    fulfillment_response: {
+      messages: [
+        {
+          responseType: "ENTRY_PROMPT",
+          type: "plainText",
+          text: {
+            text: [`<span>Great choice! You searched for <b>${product.product_name}</b>. Here are the details:</span>`
+            ]
+          }
+        }
+        ,
+        {
+          responseType: "ENTRY_PROMPT",
+          type: "formattedText",
+          text: {
+            text: [
+              `<div style="font-family: Arial, sans-serif;">
                <p>- <strong>Description:</strong> ${product.description}</p>
                <p>- <strong>Price:</strong> ${product.price}</p>
-               <p>- <strong>Availability:</strong> ${product.quantity}</p>
+               <p>- <strong>Availability:</strong> 
+                 <b><span style="color: ${stockColor};">${stockStatus}</span></b>
+               </p>
                <p>Would you like to purchase this product, or go back to the product list?</p>
              </div>`
-          ]
-        }
-      }
-      ,
-      {
-        responseType: "ENTRY_PROMPT",
-        payload: {
-          richContent: [
-            [
-              {
-                type: "chips",
-                options: [
-                  { text: "Buy" },
-                  { text: "Go back to product list" }
-                ]
-              }
             ]
-          ]
+          }
         }
-      }
-    ]
-    ,source: "WEBHOOK"
-  }
-});
-
-const buildProductSearchResponse = (product) => ({
-  fulfillment_response: {
-    messages: [
-      {
-        responseType: "ENTRY_PROMPT",
-        type: "plainText",
-        text: {
-          text: [`Great choice! You searched for ${product.product_name}. Here are the details...`
-          ]
-        }
-      }
-      ,
-      {
-        responseType: "ENTRY_PROMPT",
-        type: "formattedText",
-        text: {
-          text: [`- **Description:** ${product.description}\n- **Price:** ${product.price}\n- **Availability:** ${product.quantity}\n\nWould you like to purchase this product, or search for another item?`
-          ]
-        }
-      }
-      ,
-      {
-        responseType: "ENTRY_PROMPT",
-        payload: {
-          richContent: [
-            [
-              {
-                type: "chips",
-                options: [
-                  { text: "Buy" },
-                  { text: "Search for another item" },
-                  { text: "Go back to main menu" }
-                ]
-              }
+        ,
+        {
+          responseType: "ENTRY_PROMPT",
+          payload: {
+            richContent: [
+              [
+                {
+                  type: "chips",
+                  options: [
+                    { text: "Buy" },
+                    { text: "Search for another item" },
+                    { text: "Go back to main menu" }
+                  ]
+                }
+              ]
             ]
-          ]
+          }
         }
-      }
-    ],
-    source: "WEBHOOK"
-  }
-});
+      ],
+      source: "WEBHOOK"
+    }
+  };
+};
 
 const buildBuyProductResponse = (product) => ({
     fulfillment_response: {
@@ -251,7 +302,7 @@ const buildBuyProductResponse = (product) => ({
                  <p style="margin: 8px 0;">
                    👉 <a href="https://yourwebsite.com/payment?product=${product._id}" target="_blank">[Pay Now]</a>
                  </p>
-                 <p>If you have any issues, feel free to reach out to our customer support.</p>
+                 <p>Thank you for chatting with us! If you have more questions, feel free to start a new session. Goodbye!</p>
                </div>`
             ]
           }
