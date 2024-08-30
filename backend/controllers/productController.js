@@ -41,38 +41,38 @@ const fetchProductsUsingCategory = async (req, res) => {
 
 // Fetch product details by product name
 const productDetails = async (req, res) => {
-  logger.info(`ProductDetailsAPI - request body ${ JSON.stringify(req.body)}`);
+  logger.info(`ProductDetailsAPI - request body ${JSON.stringify(req.body)}`);
   try {
-    const product =await getProductDetails(req.body.sessionInfo.parameters.product_name);
+    const product = await getProductDetails(req.body.sessionInfo.parameters.product_name);
     if (product) {
       const response = buildProductDetailsResponse(product);
-      logger.info(`ProductDetailsAPI - response ${ JSON.stringify(response)}`);
+      logger.info(`ProductDetailsAPI - response ${JSON.stringify(response)}`);
       res.json(response);
     } else {
       res.json(buildNotFoundResponse());
     }
   } catch (error) {
-    logger.error(`ProductDetailsAPI - error ${ JSON.stringify(error.message)}`);
+    logger.error(`ProductDetailsAPI - error ${JSON.stringify(error.message)}`);
     res.status(500).send('Unable to process your request');
   }
 };
 
 // Fetch products based on search query
 const productSimilarSearch = async (req, res) => {
-  logger.info(`Received productSimilarSearch API request ${ JSON.stringify(req.body)}`);
+  logger.info(`Received productSimilarSearch API request ${JSON.stringify(req.body)}`);
   try {
     const productQuery = req.body.sessionInfo.parameters.product_name;
     const products = await searchSimilarProducts(productQuery);
-    logger.info(`productSimilarSearch product data - ${ JSON.stringify(products)}`);
+    logger.info(`productSimilarSearch product data - ${JSON.stringify(products)}`);
     if (products.length > 0) {
       const response = buildProductSearchResponse(products[0]);
-      logger.info(`productSimilarSearch API response ${ JSON.stringify(response)}`);
+      logger.info(`productSimilarSearch API response ${JSON.stringify(response)}`);
       res.json(response);
     } else {
       res.json(buildNotFoundResponse());
     }
   } catch (error) {
-    logger.error(`productSimilarSearch API error ${ error.message }`);
+    logger.error(`productSimilarSearch API error ${error.message}`);
     res.status(500).send('Unable to process your request');
   }
 };
@@ -82,12 +82,19 @@ const handleBuyProduct = async (req, res) => {
   try {
     // Extract necessary parameters from the request
     const productquery = req.body.sessionInfo.parameters.product_name;
+    const email = req.body.sessionInfo.parameters.email;
+    const quantity = req.body.sessionInfo.parameters.quantity;
     // Fetch the product details from the database
-    const product = await searchSimilarProducts(productquery);
-    logger.info(`handleBuyProduct product data - ${JSON.stringify(product)}`);
+    const product = await searchSimilarProducts(productquery)
+    const customer = await getCustomerData(email);
+
+    //Insert records into orders
+    const orderDetails = await createOrderForCustomer(customer, product[0], quantity);
+
+    logger.info(`handleBuyProduct product data - ${JSON.stringify(product)} - orderData - ${JSON.stringify(orderDetails)}`);
     if (product) {
       // Prepare the response confirming the purchase and providing the payment link
-      const response = buildBuyProductResponse(product[0]);
+      const response = buildBuyProductResponse(product[0], orderDetails.order_id);
       // Send the response back to Dialogflow
       logger.info(`handleBuyProduct API response ${JSON.stringify(response)}`);
       res.json(response);
@@ -99,13 +106,54 @@ const handleBuyProduct = async (req, res) => {
       res.json(response);
     }
   } catch (error) {
-    logger.error(`Error in handleBuyProduct webhook:${error.message}`);
+    logger.error(`Error in handleBuyProduct webhook:${error.message} - ${error.stack}`);
     // Respond with an error message
     res.status(500).json(buildGenericErrorResponse());
   }
 };
 
 // Helper functions
+const createOrderForCustomer = async (customer, product, quantityOrdered) => {
+
+  //shipping carriers list 
+  const trackingInfo = generateShippingCarrierAndTrackingNumber();
+  // Prepare data to be saved
+  const orderId = generateUniqueOrderID();
+  const ordData = {
+    order_id: orderId,
+    product_id: product._id,
+    customer_id: customer.customer_id,
+    quantity: quantityOrdered,
+    unit_price: product.price,
+    total_price: (quantityOrdered * product.price),
+    order_date: new Date(),
+    shipping_address: customer.address,
+    shipping_carrier: "To be determined after payment",//trackingInfo.Courier,
+    tracking_number: "To be determined after payment",//trackingInfo.TrackingNumber,
+    payment_method: "Pending",
+    status: "Ordered"
+  };
+
+    // Insert the order data into the 'orders' collection
+    const insertResult = await db.collection('orders').insertOne(ordData);
+
+    // Check if the insertion was acknowledged and successful
+    if (insertResult.acknowledged) {
+      logger.info('Order inserted successfully:', insertResult.insertedId);
+    } else {
+      logger.error('Failed to insert order.');
+      return null; // Return null if insertion failed
+    }
+
+    // Retrieve and return the inserted order document
+    const insertedOrder = await db.collection('orders').findOne({ order_id: orderId });
+
+    if (!insertedOrder) {
+      logger.error('No order found with order_id:', orderId);
+      return null; // Return null if no order is found
+    }
+    return insertedOrder;
+};
 
 const getDistinctCategories = async () => {
   const collection = db.collection('products');
@@ -122,7 +170,7 @@ const getProductsByCategory = async (category) => {
     { $sort: { _id: 1 } }, // Sort by product_name (ascending)
     { $limit: 10 } // Limit to 10 unique products
   ]).toArray();
-};  
+};
 
 const getProductDetails = async (productName) => {
   logger.info(`Fetching products details for a product - ${productName}`);
@@ -139,9 +187,65 @@ const searchSimilarProducts = async (query) => {
   const searchQuery = { product_name: { $regex: query } };
   const options = {
     sort: { product_name: 1 },
-    projection: { _id: 0, product_name: 1, price: 1, description: 1, quantity : 1 },
+    projection: { _id: 1, product_name: 1, price: 1, description: 1, quantity: 1 },
   };
   return await collection.find(searchQuery, options).toArray();
+};
+
+const getCustomerData = async (emailid) => {
+  logger.info(`Fetching products details for a product - ${emailid}`);
+  const collection = db.collection('customers');
+  const customer = await collection.find({ email: emailid })
+    .limit(1)
+    .project({ customer_id: 1, first_name: 1, email: 1, address: 1 })
+    .toArray();
+  return customer.length > 0 ? customer[0] : null;
+};
+
+const generateUniqueOrderID = () => {
+  // Prefix for the order ID
+  const prefix = 'ORD';
+
+  // Generate a random number with 5 digits
+  const randomNumber = Math.floor(10000 + Math.random() * 90000); // Generates a number between 10000 and 99999
+
+  // Combine the prefix and the random number to create the unique ID
+  const uniqueOrderID = `${prefix}${randomNumber}`;
+
+  return uniqueOrderID;
+};
+
+const generateShippingCarrierAndTrackingNumber = () => {
+
+  // List of courier names
+  const couriers = ["UPS", "FedEx", "DHL", "USPS", "Amazon Logistics", "Royal Mail", "Canada Post", "Australia Post", "TNT", "Aramex"];
+
+  // Pick a random courier name from the list
+  const randomCourier = couriers[Math.floor(Math.random() * couriers.length)];
+
+  // Get the current timestamp in milliseconds
+  const timestamp = Date.now().toString(); // Get the full timestamp in milliseconds
+
+  // Generate a random 5-character alphanumeric string
+  const randomAlphanumeric = generateRandomAlphanumeric(5);
+
+  // Combine the courier name, timestamp, and random alphanumeric string to form the tracking number
+  const uniqueTrackingNumber = `${randomCourier}-${timestamp}-${randomAlphanumeric}`;
+
+  return { TrackingNumber: uniqueTrackingNumber, Courier: randomCourier };
+
+};
+
+// Function to generate a random alphanumeric string of a given length
+const generateRandomAlphanumeric = (length) => {
+
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+
 };
 
 const buildRichContentResponse = (options) => ({
@@ -289,58 +393,59 @@ const buildProductSearchResponse = (product) => {
   };
 };
 
-const buildBuyProductResponse = (product) => ({
-    fulfillment_response: {
-      messages: [
-        {
-          responseType: "ENTRY_PROMPT",
-          text: {
-            text: [
-              `<div style="font-family: Arial, sans-serif;">
+const buildBuyProductResponse = (product, order_id) => ({
+  fulfillment_response: {
+    messages: [
+      {
+        responseType: "ENTRY_PROMPT",
+        text: {
+          text: [
+            `<div style="font-family: Arial, sans-serif;">
                  <p>Your order for <strong>${product.product_name}</strong> has been placed successfully!</p>
+                 <p><strong>Order Number:</strong> ${order_id}</p>
                  <p>Please complete your payment on our website using the link below:</p>
                  <p style="margin: 8px 0;">
-                   👉 <a href="https://yourwebsite.com/payment?product=${product._id}" target="_blank">[Pay Now]</a>
+                   👉 <a href="https://yourwebsite.com/payment?order=${order_id}" target="_blank">[Pay Now]</a>
                  </p>
                  <p>Thank you for chatting with us! If you have more questions, feel free to start a new session. Goodbye!</p>
                </div>`
-            ]
-          }
+          ]
         }
-      ]
-    }
+      }
+    ]
   }
+}
 );
 
 const buildProductNotFoundResponse = (productquery) => ({
-    fulfillment_response: {
-      messages: [
-        {
-          responseType: "ENTRY_PROMPT",
-          text: {
-            text: [
-              `Sorry, we couldn't find the product ${productquery}. Would you like to search for another product?`
-            ]
-          }
-        },
-        {
-          responseType: "ENTRY_PROMPT",
-          payload: {
-            richContent: [
-              [
-                {
-                  type: "chips",
-                  options: [
-                    { text: "Search for another item" },
-                    { text: "Return to main menu" }
-                  ]
-                }
-              ]
-            ]
-          }
+  fulfillment_response: {
+    messages: [
+      {
+        responseType: "ENTRY_PROMPT",
+        text: {
+          text: [
+            `Sorry, we couldn't find the product ${productquery}. Would you like to search for another product?`
+          ]
         }
-      ]
-    }
+      },
+      {
+        responseType: "ENTRY_PROMPT",
+        payload: {
+          richContent: [
+            [
+              {
+                type: "chips",
+                options: [
+                  { text: "Search for another item" },
+                  { text: "Return to main menu" }
+                ]
+              }
+            ]
+          ]
+        }
+      }
+    ]
+  }
 });
 
 const buildNotFoundResponse = () => ({
@@ -357,18 +462,18 @@ const buildNotFoundResponse = () => ({
 });
 
 const buildGenericErrorResponse = () => ({
-    fulfillment_response: {
-      messages: [
-        {
-          responseType: "ENTRY_PROMPT",
-          text: {
-            text: [
-              "Sorry, there was an issue processing your request. Please try again later."
-            ]
-          }
+  fulfillment_response: {
+    messages: [
+      {
+        responseType: "ENTRY_PROMPT",
+        text: {
+          text: [
+            "Sorry, there was an issue processing your request. Please try again later."
+          ]
         }
-      ]
-    }
+      }
+    ]
+  }
 });
 
 module.exports = { productSimilarSearch, fetchDistinctCategory, fetchProductsUsingCategory, productDetails, handleBuyProduct };

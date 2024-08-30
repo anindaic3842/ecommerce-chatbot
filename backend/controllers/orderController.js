@@ -36,6 +36,8 @@ const buildOrderTrackResponse = (order) => ({
             `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
                 <h2 style="text-align: center; color: #0073b7; margin-bottom: 20px;">Order Tracking Status</h2>
                 <p style="margin: 10px 0;"><strong style="color: #555;">Order ID:</strong> ${order.order_id}</p>
+                <p style="margin: 10px 0;"><strong style="color: #555;">Order Date:</strong> ${new Date(order.order_date).toLocaleDateString()}</p>
+                <p style="margin: 10px 0 font-weight: bold; color: ${order.payment_method === 'Pending' ? '#dc3545' : '#28a745'};"><strong style="color: #555;">Payment Method:</strong> ${order.payment_method}</p>
                 <p style="margin: 10px 0;"><strong style="color: #555;">Shipping Carrier:</strong> ${order.shipping_carrier}</p>
                 <p style="margin: 10px 0;"><strong style="color: #555;">Tracking Number:</strong> ${order.tracking_number}</p>
                 <p style="margin: 10px 0; font-weight: bold; color: ${order.status === 'Shipped' ? '#28a745' : '#dc3545'};"><strong>Current Status:</strong> ${order.status}</p>
