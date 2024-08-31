@@ -13,15 +13,39 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             height: 100vh;
         }
-        .contact-form {
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
             background-color: #ffffff;
-            padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
+            margin: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            color: #007bff;
+        }
+        .header p {
+            color: #555555;
+        }
+        .contact-info {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .contact-info p {
+            margin: 5px 0;
+            color: #555555;
+        }
+        .contact-form {
+            margin-bottom: 20px;
         }
         .contact-form h2 {
             margin-bottom: 20px;
@@ -41,7 +65,6 @@
             border-radius: 4px;
             font-size: 16px;
             color: #333333;
-            transition: border-color 0.3s;
         }
         .contact-form input:focus, .contact-form textarea:focus {
             border-color: #007bff;
@@ -61,18 +84,6 @@
         .contact-form button:hover {
             background-color: #0056b3;
         }
-        .contact-form .success-message {
-            display: none;
-            color: green;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .contact-form .error-message {
-            display: none;
-            color: red;
-            margin-bottom: 20px;
-            text-align: center;
-        }
         .loading-spinner {
             display: none;
             margin: 0 auto 20px;
@@ -87,28 +98,125 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .faq {
+            margin-top: 20px;
+        }
+        .faq h3 {
+            color: #333333;
+        }
+        .faq p {
+            color: #555555;
+        }
+        .faq a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .faq a:hover {
+            text-decoration: underline;
+        }
+        /* Popup Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+        }
+        .modal-content {
+            background-color: #ffffff;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 500px;
+            text-align: center;
+        }
+        .modal-content h4 {
+            color: #007bff;
+        }
+        .modal-content p {
+            color: #333333;
+        }
+        .close-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .close-btn:hover {
+            background-color: #0056b3;
+        }
+        .success-message, .error-message {
+            display: none; /* Hidden by default */
+        }
     </style>
 </head>
 <body>
 
-<div class="contact-form">
-    <h2>Contact Us</h2>
-    <div class="loading-spinner"></div>
-    <form id="contactForm">
-        <label for="name">Your Name</label>
-        <input type="text" id="name" name="name" required>
-        
-        <label for="email">Your Email</label>
-        <input type="email" id="email" name="email" required>
-        
-        <label for="message">Your Message</label>
-        <textarea id="message" name="message" rows="4" required></textarea>
-        
-        <button type="submit">Send Message</button>
-        
-        <div class="success-message">Your message has been sent successfully! Our customer support team is reviewing your request and will get back to you as soon as possible. Thank you for contacting us!</div>
-        <div class="error-message">There was an error sending your message. Please try again.</div>
-    </form>
+<div class="container">
+    <!-- Header Section -->
+    <div class="header">
+        <h1>Contact Us</h1>
+        <p>We're here to help and answer any questions you might have. We look forward to hearing from you!</p>
+    </div>
+
+    <!-- Contact Information -->
+    <div class="contact-info">
+        <p><strong>Email:</strong> support@yourwebsite.com</p>
+        <p><strong>Phone:</strong> +1 (123) 456-7890</p>
+        <p><strong>Address:</strong> 1234 Street Name, City, State, ZIP Code</p>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="contact-form">
+        <h2>Send Us a Message</h2>
+        <div class="loading-spinner"></div>
+        <form id="contactForm">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="email">Your Email</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="message">Your Message</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+            
+            <button type="submit">Send Message</button>
+            
+            <div class="success-message">Thank you for reaching out! Your message has been received, and a member of our support team will contact you shortly. We appreciate your patience and look forward to assisting you soon!</div>
+            <div class="error-message">There was an error sending your message. Please try again.</div>
+        </form>
+    </div>
+
+    <!-- FAQs Section -->
+    <div class="faq">
+        <h3>Frequently Asked Questions</h3>
+        <!-- Chatbot Tips -->
+        <h3>How to Use Our Chatbot</h3>
+        <p><strong>What can I ask the chatbot?</strong> You can ask about order status, product availability, store hours, and more. Just type your question, and our chatbot will assist you!</p>
+        <p><strong>Examples of what you can ask:</strong></p>
+        <ul>
+            <li>"Track my order."</li>
+            <li>"What are the latest deals?"</li>
+            <li>"Show me products"</li>
+            <li>"Search for specific product."</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Success Modal Popup -->
+<div id="successModal" class="modal">
+    <div class="modal-content">
+        <h4>Success!</h4>
+        <p>Thank you for reaching out! Your message has been received, and a member of our support team will contact you shortly. We appreciate your patience and look forward to assisting you soon!</p>
+        <button class="close-btn" onclick="closeModal()">Close</button>
+    </div>
 </div>
 
 <script>
@@ -139,8 +247,7 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
         document.querySelector('.loading-spinner').style.display = 'none';
         document.querySelector('button[type="submit"]').disabled = false;
         if (data.success) {
-            document.querySelector('.success-message').style.display = 'block';
-            document.querySelector('.error-message').style.display = 'none';
+            showModal(); // Show success modal
             this.reset(); // Clear the form fields
         } else {
             document.querySelector('.success-message').style.display = 'none';
@@ -167,6 +274,16 @@ function getSessionId() {
 
 function generateSessionId() {
     return 'session_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Function to show the modal
+function showModal() {
+    document.getElementById('successModal').style.display = 'block';
+}
+
+// Function to close the modal
+function closeModal() {
+    document.getElementById('successModal').style.display = 'none';
 }
 </script>
 
