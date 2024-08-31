@@ -26,6 +26,7 @@
         .contact-form h2 {
             margin-bottom: 20px;
             color: #333333;
+            text-align: center;
         }
         .contact-form label {
             display: block;
@@ -40,16 +41,22 @@
             border-radius: 4px;
             font-size: 16px;
             color: #333333;
+            transition: border-color 0.3s;
+        }
+        .contact-form input:focus, .contact-form textarea:focus {
+            border-color: #007bff;
+            outline: none;
         }
         .contact-form button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background-color: #007bff;
             color: white;
             border: none;
             border-radius: 4px;
             font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
         .contact-form button:hover {
             background-color: #0056b3;
@@ -58,11 +65,27 @@
             display: none;
             color: green;
             margin-bottom: 20px;
+            text-align: center;
         }
         .contact-form .error-message {
             display: none;
             color: red;
             margin-bottom: 20px;
+            text-align: center;
+        }
+        .loading-spinner {
+            display: none;
+            margin: 0 auto 20px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -70,6 +93,7 @@
 
 <div class="contact-form">
     <h2>Contact Us</h2>
+    <div class="loading-spinner"></div>
     <form id="contactForm">
         <label for="name">Your Name</label>
         <input type="text" id="name" name="name" required>
@@ -82,7 +106,7 @@
         
         <button type="submit">Send Message</button>
         
-        <div class="success-message">Your message has been sent successfully!</div>
+        <div class="success-message">Your message has been sent successfully! Our customer support team is reviewing your request and will get back to you as soon as possible. Thank you for contacting us!</div>
         <div class="error-message">There was an error sending your message. Please try again.</div>
     </form>
 </div>
@@ -91,45 +115,29 @@
 document.getElementById('contactForm').addEventListener('submit', function(e) {
     e.preventDefault(); // Prevent the default form submission
 
-        // Function to get or create the session ID
-        function getSessionId() {
-        let sessionId = sessionStorage.getItem('sessionId');
-        if (!sessionId) {
-            sessionId = generateSessionId();
-            sessionStorage.setItem('sessionId', sessionId);
-        }
-        return sessionId;
-    }
-
-    function generateSessionId() {
-        return uuid.v4();
-    }
+    // Show loading spinner
+    document.querySelector('.loading-spinner').style.display = 'block';
+    document.querySelector('button[type="submit"]').disabled = true;
 
     const formData = new FormData(this);
-        // Debug: Log each form data entry to console
-        for (let [key, value] of formData.entries()) {
-        console.log(key, value); // Log the key-value pairs
-    }
 
-
-    debugger;
     const sessionId = getSessionId();
 
     fetch('https://ai-customer-chatbot.ue.r.appspot.com/common/contactinfo', 
     {
         method: 'POST',
         headers: {
-                    'Content-Type': 'application/json',
-                    //'Origin': 'http: //localhost',
-                    //'Referer': 'http: //localhost/'
-                },
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-                    sessionId: sessionId,
-                    contactus: Object.fromEntries(formData.entries())
-                })
+            sessionId: sessionId,
+            contactus: Object.fromEntries(formData.entries())
+        })
     })
     .then(response => response.json())
     .then(data => {
+        document.querySelector('.loading-spinner').style.display = 'none';
+        document.querySelector('button[type="submit"]').disabled = false;
         if (data.success) {
             document.querySelector('.success-message').style.display = 'block';
             document.querySelector('.error-message').style.display = 'none';
@@ -141,10 +149,25 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
     })
     .catch((error) => {
         console.error('Error:', error);
+        document.querySelector('.loading-spinner').style.display = 'none';
+        document.querySelector('button[type="submit"]').disabled = false;
         document.querySelector('.success-message').style.display = 'none';
         document.querySelector('.error-message').style.display = 'block';
     });
 });
+
+function getSessionId() {
+    let sessionId = sessionStorage.getItem('sessionId');
+    if (!sessionId) {
+        sessionId = generateSessionId();
+        sessionStorage.setItem('sessionId', sessionId);
+    }
+    return sessionId;
+}
+
+function generateSessionId() {
+    return 'session_' + Math.random().toString(36).substr(2, 9);
+}
 </script>
 
 </body>
