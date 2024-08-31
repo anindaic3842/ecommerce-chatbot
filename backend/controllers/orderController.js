@@ -8,6 +8,14 @@ const constants = require('../utils/constants');
 const OrderNotFoundQuickReplies = constants.buildDynamicQuickReplies(["Re-enter Order Number","Return to main menu","Speak to customer support"]).payload;
 const OrderFoundQuickReplies = constants.buildDynamicQuickReplies(["Return to main menu"]).payload;
 
+/**
+ * This method gives the order status based on the order number sent
+ *
+ * @async
+ * @param {*} req
+ * @param {*} res
+ * @returns {*}
+ */
 const orderstatus = async (req, res) => {
   logger.info(`Received orderstatus API request ${JSON.stringify(req.body)}`);
   try {
@@ -26,6 +34,12 @@ const orderstatus = async (req, res) => {
   }
 };
 
+/**
+ * Description placeholder
+ *
+ * @param {*} order
+ * @returns {{ fulfillment_response: { messages: {}; }; }}
+ */
 const buildOrderTrackResponse = (order) => ({
   fulfillment_response: {
     messages: [
@@ -58,6 +72,11 @@ const buildOrderTrackResponse = (order) => ({
 }
 );
 
+/**
+ * Description placeholder
+ *
+ * @returns {{ fulfillment_response: { messages: {}; }; }}
+ */
 const buildNoOrderResponse = () => ({
   fulfillment_response: {
     messages: [

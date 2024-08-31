@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: backend/controllers/commonController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: backend/controllers/commonController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { db } = require("../config/dbConfig");
+const logger = require("../utils/logger");
+
+// API Endpoint to handle form submission
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} req
+ * @param {*} res
+ * @returns {unknown}
+ */
+const handleFormSubmission = async (req, res) => {
+  if (req.body == null || req.body.sessionId == null) {
+    logger.error(
+      `The request body for handleFormSubmission has an issue - ${JSON.stringify(
+        req.body
+      )}`
+    );
+    return res.status(500).send("Error processing request");
+  }
+
+  try {
+    const contactusfields = req.body.contactus;
+
+    logger.info(`request body for CONTACT US Page ${JSON.stringify(req.body)}`);
+
+    if (
+      !contactusfields.name ||
+      !contactusfields.email ||
+      !contactusfields.message
+    ) {
+      // Respond with an error if any of the fields are missing
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Please provide all required fields.",
+        });
+    }
+
+    // Here, you could implement additional logic such as:
+    // Prepare data to be saved
+    const formData = {
+      full_name: contactusfields.name,
+      email: contactusfields.email,
+      Message: contactusfields.message,
+      message_date: new Date(),
+    };
+
+    // Insert form data into MongoDB collection
+    db.collection("contactus")
+      .insertOne(formData)
+      .then((result) => {
+        console.log(`New contact inserted with ID: ${result.insertedId}`);
+        res.json({
+          success: true,
+          message: "Your message has been received. Thank you!",
+        });
+      })
+      .catch((error) => {
+        console.error("Error inserting data into MongoDB:", error);
+        res
+          .status(500)
+          .json({
+            success: false,
+            message: "An error occurred. Please try again later.",
+          });
+      });
+
+    // For demonstration, we'll just log the received data
+    console.log(
+      `Received contact form submission:\nName: ${contactusfields.name}\nEmail: ${contactusfields.email}\nMessage: ${contactusfields.message}`
+    );
+
+    // Respond with a success message
+    res.json({
+      success: true,
+      message: "Your message has been received. Thank you!",
+    });
+  } catch (error) {
+    logger.error(
+      `handleFormSubmission error - ${JSON.stringify(
+        error.message
+      )} - ${JSON.stringify(error.stack)}`
+    );
+    res.status(500).send("Error processing request");
+  }
+};
+
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} req
+ * @param {*} res
+ * @returns {unknown}
+ */
+const checkEmailfromCustomer = async (req, res) => {
+  if (req.body == null || !req.body.sessionInfo.parameters.email) {
+    logger.error(
+      `The request body for checkEmailfromCustomer has an issue - ${JSON.stringify(
+        req.body
+      )}`
+    );
+    return res.status(500).send("Error processing request");
+  }
+  logger.info(
+    `checkEmailfromCustomer request body - ${JSON.stringify(req.body)}`
+  );
+  try {
+    const sessionInfoValues = req.body.sessionInfo;
+    const email = req.body.sessionInfo.parameters.email;
+
+    // Check if the email exists in the database
+    const user = await db.collection("customers").findOne({ email: email });
+
+    if (user) {
+      // Email found - continue the flow
+      res.json({
+        fulfillment_response: {
+          messages: [
+            {
+              text: {
+                text: [
+                  `&lt;span>Welcome back &lt;b>${user.first_name} ${user.last_name}&lt;/b>. Let us continue with your purchase.&lt;/span>`,
+                ],
+              },
+            },
+          ],
+        },
+        sessionInfo: {
+          parameters: {
+            goahead: "OK",
+          },
+        },
+      });
+    } else {
+      // Email not found - end the session
+      res.json({
+        fulfillment_response: {
+          messages: [
+            {
+              text: {
+                text: [
+                  "Uh Oh! Looks like you are not registered with us. Please sign up first to place an order.",
+                ],
+              },
+            },
+          ],
+        },
+        pageInfo: {
+          currentPage: null,
+          endInteraction: true,
+        },
+        sessionInfo: {
+          parameters: {
+            goahead: null,
+            email: null,
+            quantity: null,
+          },
+        },
+      });
+    }
+  } catch (error) {
+    logger.error(
+      `checkEmailfromCustomer error - ${JSON.stringify(
+        error.message
+      )} - ${JSON.stringify(error.stack)}`
+    );
+    res.status(500).send("Error processing request");
+  }
+};
+
+module.exports = {
+  handleFormSubmission,
+  checkEmailfromCustomer,
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildBuyProductResponse">buildBuyProductResponse</a></li><li><a href="global.html#buildDealsAvailableResponse">buildDealsAvailableResponse</a></li><li><a href="global.html#buildGenericErrorResponse">buildGenericErrorResponse</a></li><li><a href="global.html#buildNoDealsResponse">buildNoDealsResponse</a></li><li><a href="global.html#buildNoOrderResponse">buildNoOrderResponse</a></li><li><a href="global.html#buildNotFoundResponse">buildNotFoundResponse</a></li><li><a href="global.html#buildOrderTrackResponse">buildOrderTrackResponse</a></li><li><a href="global.html#buildProductDetailsResponse">buildProductDetailsResponse</a></li><li><a href="global.html#buildProductNotFoundResponse">buildProductNotFoundResponse</a></li><li><a href="global.html#buildProductSearchResponse">buildProductSearchResponse</a></li><li><a href="global.html#buildRichContentResponse">buildRichContentResponse</a></li><li><a href="global.html#checkEmailfromCustomer">checkEmailfromCustomer</a></li><li><a href="global.html#createOrderForCustomer">createOrderForCustomer</a></li><li><a href="global.html#detectIntent">detectIntent</a></li><li><a href="global.html#fetchDistinctCategory">fetchDistinctCategory</a></li><li><a href="global.html#fetchProductsUsingCategory">fetchProductsUsingCategory</a></li><li><a href="global.html#generateRandomAlphanumeric">generateRandomAlphanumeric</a></li><li><a href="global.html#generateShippingCarrierAndTrackingNumber">generateShippingCarrierAndTrackingNumber</a></li><li><a href="global.html#generateUniqueOrderID">generateUniqueOrderID</a></li><li><a href="global.html#getCustomerData">getCustomerData</a></li><li><a href="global.html#getDistinctCategories">getDistinctCategories</a></li><li><a href="global.html#getLatestDeals">getLatestDeals</a></li><li><a href="global.html#getProductDetails">getProductDetails</a></li><li><a href="global.html#getProductsByCategory">getProductsByCategory</a></li><li><a href="global.html#handleBuyProduct">handleBuyProduct</a></li><li><a href="global.html#handleFormSubmission">handleFormSubmission</a></li><li><a href="global.html#orderstatus">orderstatus</a></li><li><a href="global.html#productDetails">productDetails</a></li><li><a href="global.html#productSimilarSearch">productSimilarSearch</a></li><li><a href="global.html#searchSimilarProducts">searchSimilarProducts</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 29 2024 23:16:57 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

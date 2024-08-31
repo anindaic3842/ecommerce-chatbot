@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="13" failures="0" errors="0" time="0.133">
+  <testsuite name="Common Controller" errors="0" failures="0" skipped="0" timestamp="2024-08-30T05:13:24" time="0.093" tests="8">
+    <testcase classname="Common Controller handleFormSubmission should return 500 if request body or sessionId is missing" name="Common Controller handleFormSubmission should return 500 if request body or sessionId is missing" time="0.001">
+    </testcase>
+    <testcase classname="Common Controller handleFormSubmission should return 400 if required fields are missing" name="Common Controller handleFormSubmission should return 400 if required fields are missing" time="0">
+    </testcase>
+    <testcase classname="Common Controller handleFormSubmission should insert form data into the database and return success message" name="Common Controller handleFormSubmission should insert form data into the database and return success message" time="0.001">
+    </testcase>
+    <testcase classname="Common Controller handleFormSubmission should handle database insertion errors gracefully" name="Common Controller handleFormSubmission should handle database insertion errors gracefully" time="0.005">
+    </testcase>
+    <testcase classname="Common Controller checkEmailfromCustomer should return 500 if request body or email is missing" name="Common Controller checkEmailfromCustomer should return 500 if request body or email is missing" time="0.001">
+    </testcase>
+    <testcase classname="Common Controller checkEmailfromCustomer should return fulfillment response if email exists in the database" name="Common Controller checkEmailfromCustomer should return fulfillment response if email exists in the database" time="0">
+    </testcase>
+    <testcase classname="Common Controller checkEmailfromCustomer should return a message to register if email does not exist in the database" name="Common Controller checkEmailfromCustomer should return a message to register if email does not exist in the database" time="0">
+    </testcase>
+    <testcase classname="Common Controller checkEmailfromCustomer should handle errors gracefully during email check" name="Common Controller checkEmailfromCustomer should handle errors gracefully during email check" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="Deals Controller" errors="0" failures="0" skipped="0" timestamp="2024-08-30T05:13:24" time="0.018" tests="5">
+    <testcase classname="Deals Controller getLatestDeals should log the API request and handle successful data retrieval" name="Deals Controller getLatestDeals should log the API request and handle successful data retrieval" time="0.001">
+    </testcase>
+    <testcase classname="Deals Controller getLatestDeals should log an error and return 500 if database retrieval fails" name="Deals Controller getLatestDeals should log an error and return 500 if database retrieval fails" time="0.001">
+    </testcase>
+    <testcase classname="Deals Controller getLatestDeals should return a response with no deals if dealsData is empty" name="Deals Controller getLatestDeals should return a response with no deals if dealsData is empty" time="0">
+    </testcase>
+    <testcase classname="Deals Controller Helper Functions should return the correct response structure for no deals available" name="Deals Controller Helper Functions should return the correct response structure for no deals available" time="0">
+    </testcase>
+    <testcase classname="Deals Controller Helper Functions should return the correct response structure when deals are available" name="Deals Controller Helper Functions should return the correct response structure when deals are available" time="0">
+    </testcase>
+  </testsuite>
+</testsuites>

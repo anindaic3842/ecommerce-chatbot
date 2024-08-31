@@ -4,7 +4,14 @@ const { text } = require('body-parser');
 const { db } = require('../config/dbConfig');
 const logger = require('../utils/logger');
 
-// Fetch distinct product categories
+/**
+ * Fetch distinct product categories
+ *
+ * @async
+ * @param {*} req
+ * @param {*} res
+ * @returns {*}
+ */
 const fetchDistinctCategory = async (req, res) => {
   logger.info('Entered API for Distinct Category Search');
   try {
@@ -22,6 +29,14 @@ const fetchDistinctCategory = async (req, res) => {
 };
 
 // Fetch products based on category
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} req
+ * @param {*} res
+ * @returns {*}
+ */
 const fetchProductsUsingCategory = async (req, res) => {
   try {
     logger.info(`ProductSearchAPI - Request Body - ${JSON.stringify(req.body)}`);
@@ -40,6 +55,14 @@ const fetchProductsUsingCategory = async (req, res) => {
 };
 
 // Fetch product details by product name
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} req
+ * @param {*} res
+ * @returns {*}
+ */
 const productDetails = async (req, res) => {
   logger.info(`ProductDetailsAPI - request body ${JSON.stringify(req.body)}`);
   try {
@@ -58,6 +81,14 @@ const productDetails = async (req, res) => {
 };
 
 // Fetch products based on search query
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} req
+ * @param {*} res
+ * @returns {*}
+ */
 const productSimilarSearch = async (req, res) => {
   logger.info(`Received productSimilarSearch API request ${JSON.stringify(req.body)}`);
   try {
@@ -77,6 +108,14 @@ const productSimilarSearch = async (req, res) => {
   }
 };
 
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} req
+ * @param {*} res
+ * @returns {*}
+ */
 const handleBuyProduct = async (req, res) => {
   logger.info(`Received handleBuyProduct API request ${JSON.stringify(req.body)}`);
   try {
@@ -113,6 +152,15 @@ const handleBuyProduct = async (req, res) => {
 };
 
 // Helper functions
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} customer
+ * @param {*} product
+ * @param {*} quantityOrdered
+ * @returns {unknown}
+ */
 const createOrderForCustomer = async (customer, product, quantityOrdered) => {
 
   //shipping carriers list 
@@ -155,11 +203,24 @@ const createOrderForCustomer = async (customer, product, quantityOrdered) => {
     return insertedOrder;
 };
 
+/**
+ * Description placeholder
+ *
+ * @async
+ * @returns {unknown}
+ */
 const getDistinctCategories = async () => {
   const collection = db.collection('products');
   return (await collection.distinct('category')).sort();
 };
 
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} category
+ * @returns {unknown}
+ */
 const getProductsByCategory = async (category) => {
   logger.info(`Finding products for a Category - ${category}`);
   const collection = db.collection('products');
@@ -172,6 +233,13 @@ const getProductsByCategory = async (category) => {
   ]).toArray();
 };
 
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} productName
+ * @returns {unknown}
+ */
 const getProductDetails = async (productName) => {
   logger.info(`Fetching products details for a product - ${productName}`);
   const collection = db.collection('products');
@@ -182,6 +250,13 @@ const getProductDetails = async (productName) => {
   return products.length > 0 ? products[0] : null;
 };
 
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} query
+ * @returns {unknown}
+ */
 const searchSimilarProducts = async (query) => {
   const collection = db.collection('products');
   const searchQuery = { product_name: { $regex: query } };
@@ -192,6 +267,13 @@ const searchSimilarProducts = async (query) => {
   return await collection.find(searchQuery, options).toArray();
 };
 
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} emailid
+ * @returns {unknown}
+ */
 const getCustomerData = async (emailid) => {
   logger.info(`Fetching products details for a product - ${emailid}`);
   const collection = db.collection('customers');
@@ -202,6 +284,11 @@ const getCustomerData = async (emailid) => {
   return customer.length > 0 ? customer[0] : null;
 };
 
+/**
+ * Description placeholder
+ *
+ * @returns {string}
+ */
 const generateUniqueOrderID = () => {
   // Prefix for the order ID
   const prefix = 'ORD';
@@ -215,6 +302,11 @@ const generateUniqueOrderID = () => {
   return uniqueOrderID;
 };
 
+/**
+ * Description placeholder
+ *
+ * @returns {{ TrackingNumber: string; Courier: any; }}
+ */
 const generateShippingCarrierAndTrackingNumber = () => {
 
   // List of courier names
@@ -237,6 +329,12 @@ const generateShippingCarrierAndTrackingNumber = () => {
 };
 
 // Function to generate a random alphanumeric string of a given length
+/**
+ * Description placeholder
+ *
+ * @param {*} length
+ * @returns {string}
+ */
 const generateRandomAlphanumeric = (length) => {
 
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -248,6 +346,12 @@ const generateRandomAlphanumeric = (length) => {
 
 };
 
+/**
+ * Description placeholder
+ *
+ * @param {*} options
+ * @returns {{ fulfillment_response: { messages: {}; }; }}
+ */
 const buildRichContentResponse = (options) => ({
   fulfillment_response: {
     messages: [
@@ -267,6 +371,12 @@ const buildRichContentResponse = (options) => ({
   }
 });
 
+/**
+ * Description placeholder
+ *
+ * @param {*} product
+ * @returns {{ fulfillment_response: { messages: {}; source: string; }; }}
+ */
 const buildProductDetailsResponse = (product) => {
   // Determine stock status and color based on quantity
   let stockStatus = "";
@@ -325,6 +435,12 @@ const buildProductDetailsResponse = (product) => {
   };
 };
 
+/**
+ * Description placeholder
+ *
+ * @param {*} product
+ * @returns {{ fulfillment_response: { messages: {}; source: string; }; }}
+ */
 const buildProductSearchResponse = (product) => {
 
   let stockStatus = "";
@@ -393,6 +509,13 @@ const buildProductSearchResponse = (product) => {
   };
 };
 
+/**
+ * Description placeholder
+ *
+ * @param {*} product
+ * @param {*} order_id
+ * @returns {{ fulfillment_response: { messages: {}; }; }}
+ */
 const buildBuyProductResponse = (product, order_id) => ({
   fulfillment_response: {
     messages: [
@@ -417,6 +540,12 @@ const buildBuyProductResponse = (product, order_id) => ({
 }
 );
 
+/**
+ * Description placeholder
+ *
+ * @param {*} productquery
+ * @returns {{ fulfillment_response: { messages: {}; }; }}
+ */
 const buildProductNotFoundResponse = (productquery) => ({
   fulfillment_response: {
     messages: [
@@ -448,6 +577,11 @@ const buildProductNotFoundResponse = (productquery) => ({
   }
 });
 
+/**
+ * Description placeholder
+ *
+ * @returns {{ fulfillment_response: { messages: {}; }; }}
+ */
 const buildNotFoundResponse = () => ({
   fulfillment_response: {
     messages: [
@@ -461,6 +595,11 @@ const buildNotFoundResponse = () => ({
   }
 });
 
+/**
+ * Description placeholder
+ *
+ * @returns {{ fulfillment_response: { messages: {}; }; }}
+ */
 const buildGenericErrorResponse = () => ({
   fulfillment_response: {
     messages: [

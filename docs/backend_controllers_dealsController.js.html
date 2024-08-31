@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: backend/controllers/dealsController.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: backend/controllers/dealsController.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const { db } = require("../config/dbConfig");
+const logger = require("../utils/logger");
+
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} req
+ * @param {*} res
+ * @returns {*}
+ */
+const getLatestDeals = async (req, res) => {
+  logger.info(
+    `Received getLatestDeals API request ${JSON.stringify(req.body)}`
+  );
+  try {
+    //const orderNumber = req.body.sessionInfo.parameters.param_order_number;
+    const collection = db.collection("deals");
+    const dealsData = await collection
+      .find()
+      .sort({ discount_percentage: -1 })
+      .limit(5)
+      .toArray();
+    logger.info(`getLatestDeals API order data - ${JSON.stringify(dealsData)}`);
+    if (dealsData) {
+      res.json(buildDealsAvailableResponse(dealsData));
+    } else {
+      res.json(buildNoDealsResponse());
+    }
+  } catch (error) {
+    logger.error(`getLatestDeals API error - ${error.message}`);
+    res.status(500).send("Unable to process your request");
+  }
+};
+
+/**
+ * Description placeholder
+ *
+ * @returns {{ fulfillment_response: { messages: {}; }; }}
+ */
+const buildNoDealsResponse = () => ({
+  fulfillment_response: {
+    messages: [
+      {
+        responseType: "ENTRY_PROMPT",
+        text: {
+          text: ["There are no deals available right now."],
+        },
+      },
+    ],
+  },
+});
+
+/**
+ * Description placeholder
+ *
+ * @param {*} dealsData
+ * @returns {{ fulfillment_response: { messages: {}; }; }}
+ */
+const buildDealsAvailableResponse = (dealsData) => ({
+  fulfillment_response: {
+    messages: [
+      {
+        responseType: "ENTRY_PROMPT",
+        payload: {
+          richContent: [
+            [
+              {
+                type: "carousel-card",
+                title: "Summer Savings",
+                description: "Up to 50% off on selected items",
+                image:
+                  "https://via.placeholder.com/300x200.png?text=Sample+Image",
+                link: "https://example.com/deals/summer-savings",
+                buttons: [
+                  { text: "Buy now", link: "https://example.com/buy" },
+                  { text: "Learn more", link: "https://example.com/learn" },
+                ],
+              },
+              {
+                type: "carousel-card",
+                title: "Winter Wonderland Deals",
+                description: "Exclusive winter sale with up to 40% off",
+                image:
+                  "https://via.placeholder.com/300x200.png?text=Sample+Image",
+                link: "https://example.com/deals/summer-savings",
+                buttons: [
+                  { text: "Buy now", link: "https://example.com/buy" },
+                  { text: "Learn more", link: "https://example.com/learn" },
+                ],
+              },
+              {
+                type: "carousel-card",
+                title: "Spring Into Savings",
+                description: "Fresh deals with up to 30% off",
+                image:
+                  "https://via.placeholder.com/300x200.png?text=Sample+Image",
+                link: "https://example.com/deals/summer-savings",
+                buttons: [
+                  { text: "Buy now", link: "https://example.com/buy" },
+                  { text: "Learn more", link: "https://example.com/learn" },
+                ],
+              },
+            ],
+          ],
+        },
+      },
+      {
+        responseType: "ENTRY_PROMPT",
+        payload: {
+          richContent: [
+            [
+              {
+                type: "chips",
+                options: [
+                  { text: "Search for a product" },
+                  { text: "Go back to main menu" },
+                ],
+              },
+            ],
+          ],
+        },
+      },
+    ],
+  },
+});
+
+module.exports = {
+  getLatestDeals,
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildBuyProductResponse">buildBuyProductResponse</a></li><li><a href="global.html#buildDealsAvailableResponse">buildDealsAvailableResponse</a></li><li><a href="global.html#buildGenericErrorResponse">buildGenericErrorResponse</a></li><li><a href="global.html#buildNoDealsResponse">buildNoDealsResponse</a></li><li><a href="global.html#buildNoOrderResponse">buildNoOrderResponse</a></li><li><a href="global.html#buildNotFoundResponse">buildNotFoundResponse</a></li><li><a href="global.html#buildOrderTrackResponse">buildOrderTrackResponse</a></li><li><a href="global.html#buildProductDetailsResponse">buildProductDetailsResponse</a></li><li><a href="global.html#buildProductNotFoundResponse">buildProductNotFoundResponse</a></li><li><a href="global.html#buildProductSearchResponse">buildProductSearchResponse</a></li><li><a href="global.html#buildRichContentResponse">buildRichContentResponse</a></li><li><a href="global.html#checkEmailfromCustomer">checkEmailfromCustomer</a></li><li><a href="global.html#createOrderForCustomer">createOrderForCustomer</a></li><li><a href="global.html#detectIntent">detectIntent</a></li><li><a href="global.html#fetchDistinctCategory">fetchDistinctCategory</a></li><li><a href="global.html#fetchProductsUsingCategory">fetchProductsUsingCategory</a></li><li><a href="global.html#generateRandomAlphanumeric">generateRandomAlphanumeric</a></li><li><a href="global.html#generateShippingCarrierAndTrackingNumber">generateShippingCarrierAndTrackingNumber</a></li><li><a href="global.html#generateUniqueOrderID">generateUniqueOrderID</a></li><li><a href="global.html#getCustomerData">getCustomerData</a></li><li><a href="global.html#getDistinctCategories">getDistinctCategories</a></li><li><a href="global.html#getLatestDeals">getLatestDeals</a></li><li><a href="global.html#getProductDetails">getProductDetails</a></li><li><a href="global.html#getProductsByCategory">getProductsByCategory</a></li><li><a href="global.html#handleBuyProduct">handleBuyProduct</a></li><li><a href="global.html#handleFormSubmission">handleFormSubmission</a></li><li><a href="global.html#orderstatus">orderstatus</a></li><li><a href="global.html#productDetails">productDetails</a></li><li><a href="global.html#productSimilarSearch">productSimilarSearch</a></li><li><a href="global.html#searchSimilarProducts">searchSimilarProducts</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Thu Aug 29 2024 23:16:57 GMT-0400 (Eastern Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

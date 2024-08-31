@@ -1,20 +1,43 @@
 //Handles all Dialogflow-related requests.
 // dialogflowController.js
-const { log } = require('winston');
-const { sessionClient, sessionId, projectId, locationId, agentId, languageCd } = require('../config/dialogflowConfig');
-const logger = require('../utils/logger');
+const { log } = require("winston");
+const {
+  sessionClient,
+  sessionId,
+  projectId,
+  locationId,
+  agentId,
+  languageCd,
+} = require("../config/dialogflowConfig");
+const logger = require("../utils/logger");
 const currentPageInFlow = {
-  browse_products_page : 'Show me ',
-  select_category_page: 'Show me ',
-  default_page:'',
+  browse_products_page: "Show me ",
+  select_category_page: "Show me ",
+  default_page: "",
 };
 
+/**
+ * Description placeholder
+ *
+ * @async
+ * @param {*} req
+ * @param {*} res
+ * @returns {*}
+ */
 const detectIntent = async (req, res) => {
-  logger.info(`Received detectIntent request with requestBody as - ${JSON.stringify(req.body)}`);
-  
-  if(req.body == null || req.body.sessionId == null) {
-    logger.error(`The request body for detectIntent has an issue - ${JSON.stringify(req.body)}`);
-    res.status(500).send('Error processing request');
+  logger.info(
+    `Received detectIntent request with requestBody as - ${JSON.stringify(
+      req.body
+    )}`
+  );
+
+  if (req.body == null || req.body.sessionId == null) {
+    logger.error(
+      `The request body for detectIntent has an issue - ${JSON.stringify(
+        req.body
+      )}`
+    );
+    res.status(500).send("Error processing request");
   }
 
   const userSessionId = req.body.sessionId;
@@ -23,7 +46,7 @@ const detectIntent = async (req, res) => {
     projectId,
     locationId,
     agentId,
-    userSessionId,
+    userSessionId
   );
 
   const request = {
@@ -31,7 +54,7 @@ const detectIntent = async (req, res) => {
     queryInput: {
       text: {
         text: req.body.queryResult.queryText,
-        parameters: req.body.queryResult.parameters
+        parameters: req.body.queryResult.parameters,
       },
       languageCode: languageCd,
     },
@@ -42,23 +65,30 @@ const detectIntent = async (req, res) => {
     let carouselData = [];
     const responses = await sessionClient.detectIntent(request);
     logger.info(`response body - ${JSON.stringify(responses[0])}`);
-    
-    const reqAppMessage = (responses[0].queryResult.currentPage !== null) ? responses[0].queryResult.currentPage.displayName : 'default_page';
+
+    const reqAppMessage =
+      responses[0].queryResult.currentPage !== null
+        ? responses[0].queryResult.currentPage.displayName
+        : "default_page";
     //const reqAppMessage = responses[0].queryResult.intent.displayName;
     const responseMessages = responses[0].queryResult.responseMessages;
 
     const responseText = [];
-    logger.info(`detectIntent - reading response before extracting text - ${JSON.stringify(responses)}`);
+    logger.info(
+      `detectIntent - reading response before extracting text - ${JSON.stringify(
+        responses
+      )}`
+    );
 
     if (responseMessages && responseMessages.length > 0) {
-      responseMessages.forEach(message => {
+      responseMessages.forEach((message) => {
         if (message.text && message.text.text) {
           responseText.push(message.text.text[0]);
         }
       });
 
       if (responseText.length == 0) {
-        responseText.push('Sorry, I didn’t understand that.');
+        responseText.push("Sorry, I didn’t understand that.");
       }
     }
 
@@ -75,17 +105,24 @@ const detectIntent = async (req, res) => {
               options.forEach((option) => {
                 quickReplies.push(option.structValue.fields.text.stringValue);
               });
-            }
-            else if (itemFields.type.stringValue === "carousel-card") {
-              logger.info(`inside loop for carousel - ${JSON.stringify(itemFields)}`);
-              logger.info(`inside loop for carousel buttoin data- ${JSON.stringify(itemFields.buttons.listValue.values)}`);
+            } else if (itemFields.type.stringValue === "carousel-card") {
+              logger.info(
+                `inside loop for carousel - ${JSON.stringify(itemFields)}`
+              );
+              logger.info(
+                `inside loop for carousel buttoin data- ${JSON.stringify(
+                  itemFields.buttons.listValue.values
+                )}`
+              );
               // Correctly parse the buttons array using map
-              const buttonData = itemFields.buttons.listValue.values.map((btn) => {
-                return {
-                  text: btn.structValue.fields.text.stringValue,
-                  link: btn.structValue.fields.link.stringValue
-                };
-              });
+              const buttonData = itemFields.buttons.listValue.values.map(
+                (btn) => {
+                  return {
+                    text: btn.structValue.fields.text.stringValue,
+                    link: btn.structValue.fields.link.stringValue,
+                  };
+                }
+              );
               // Handling "carousel"
               const carouselItem = {
                 type: itemFields.type.stringValue,
@@ -96,7 +133,9 @@ const detectIntent = async (req, res) => {
                 buttons: buttonData,
               };
               carouselData.push(carouselItem);
-              logger.info(`carousel items end loop data ${JSON.stringify(carouselItem)}`);
+              logger.info(
+                `carousel items end loop data ${JSON.stringify(carouselItem)}`
+              );
             }
           });
         });
@@ -107,10 +146,10 @@ const detectIntent = async (req, res) => {
     if (carouselData.length > 0) {
       responseText.push({
         type: "carousel-card",
-        items: carouselData
+        items: carouselData,
       });
     }
-    
+
     logger.info(`creating quick replies ${JSON.stringify(quickReplies)}`);
     logger.info(`carousal data ${JSON.stringify(carouselData)}`);
     logger.info(`creating append text ${JSON.stringify(reqAppMessage)}`);
@@ -118,12 +157,16 @@ const detectIntent = async (req, res) => {
       fulfillmentText: responseText,
       quickReplies: quickReplies,
       carouselData: carouselData,
-      requestAppendMessage: currentPageInFlow[reqAppMessage] || '',
-      sessionId: sessionId
+      requestAppendMessage: currentPageInFlow[reqAppMessage] || "",
+      sessionId: sessionId,
     });
   } catch (error) {
-    logger.error(`detectIntent error - ${ JSON.stringify(error.message) } - ${ JSON.stringify(error.stack) }`);
-    res.status(500).send('Error processing request');
+    logger.error(
+      `detectIntent error - ${JSON.stringify(error.message)} - ${JSON.stringify(
+        error.stack
+      )}`
+    );
+    res.status(500).send("Error processing request");
     //throw error;
   }
 };
