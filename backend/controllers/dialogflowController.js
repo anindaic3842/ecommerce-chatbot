@@ -31,13 +31,13 @@ const detectIntent = async (req, res) => {
     )}`
   );
 
-  if (req.body == null || req.body.sessionId == null) {
+  if (req.body == null || req.body.sessionId == null || req.body.queryResult ==null || req.body.queryResult.queryText == null || req.body.queryResult.parameters == null) {
     logger.error(
       `The request body for detectIntent has an issue - ${JSON.stringify(
         req.body
       )}`
     );
-    res.status(500).send("Error processing request");
+    return res.status(500).send("Error processing request");
   }
 
   const userSessionId = req.body.sessionId;

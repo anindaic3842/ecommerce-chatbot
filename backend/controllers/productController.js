@@ -4,6 +4,7 @@ const { text } = require('body-parser');
 const { db } = require('../config/dbConfig');
 const logger = require('../utils/logger');
 
+
 /**
  * Fetch distinct product categories
  *
